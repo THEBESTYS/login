@@ -1,380 +1,280 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 | 회원가입</title>
+    <title>인증 페이지</title>
     <style>
-        /* 기본 초기화 */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; 
-            background: #f0f2f5; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            padding: 20px; 
+        /* 완전히 기본적인 스타일 */
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
         }
-        
-        /* 메인 컨테이너 */
-        .auth-container {
-            width: 100%;
+        .container {
             max-width: 400px;
+            margin: 50px auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            overflow: hidden;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        /* 탭 버튼 */
         .tabs {
             display: flex;
+            margin-bottom: 20px;
             border-bottom: 1px solid #ddd;
         }
-        .tab-button {
-            flex: 1;
-            padding: 16px;
-            text-align: center;
-            background: #f8f9fa;
+        .tab {
+            padding: 10px 20px;
+            background: none;
             border: none;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            color: #666;
-            transition: all 0.3s;
+            font-size: 16px;
         }
-        .tab-button.active {
-            background: white;
-            color: #1976d2;
-            border-bottom: 2px solid #1976d2;
+        .tab.active {
+            border-bottom: 2px solid #007bff;
+            color: #007bff;
+            font-weight: bold;
         }
-        
-        /* 폼 영역 */
-        .form-panel {
-            padding: 30px;
+        .form {
             display: none;
         }
-        .form-panel.active {
+        .form.active {
             display: block;
         }
-        
-        /* 입력 필드 */
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         label {
             display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
-        input[type="text"],
-        input[type="email"],
-        input[type="password"] {
+        input {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            transition: border 0.3s;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
-        input:focus {
-            outline: none;
-            border-color: #1976d2;
-            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
-        }
-        
-        /* 버튼 */
-        .btn {
+        button.submit {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
+            background: #007bff;
+            color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s;
             margin-top: 10px;
         }
-        .btn-login {
-            background: #1976d2;
-            color: white;
+        button.submit:hover {
+            background: #0056b3;
         }
-        .btn-login:hover {
-            background: #1565c0;
-        }
-        .btn-signup {
-            background: #4caf50;
-            color: white;
-        }
-        .btn-signup:hover {
-            background: #43a047;
-        }
-        .btn-github {
-            background: #24292e;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-github:hover {
-            background: #1a1e22;
-        }
-        
-        /* 링크 */
         .links {
             text-align: center;
             margin-top: 20px;
-            font-size: 14px;
             color: #666;
         }
         .links a {
-            color: #1976d2;
+            color: #007bff;
             text-decoration: none;
-            margin: 0 8px;
+            margin: 0 5px;
         }
-        .links a:hover {
-            text-decoration: underline;
-        }
-        
-        /* 구분선 */
         .divider {
             text-align: center;
             margin: 20px 0;
-            position: relative;
             color: #999;
         }
-        .divider:before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: #eee;
-        }
-        .divider span {
-            background: white;
-            padding: 0 15px;
-            position: relative;
-        }
-        
-        /* 체크박스 */
-        .checkbox {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .checkbox input {
-            margin-right: 8px;
-        }
-        
-        /* 약관 영역 */
-        .terms-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 20px 0;
-            max-height: 150px;
-            overflow-y: auto;
-            border: 1px solid #eee;
+        .btn-github {
+            width: 100%;
+            padding: 12px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="auth-container">
-        <!-- 탭 메뉴 -->
+    <div class="container">
         <div class="tabs">
-            <button class="tab-button active" onclick="showTab('login')">로그인</button>
-            <button class="tab-button" onclick="showTab('signup')">회원가입</button>
+            <button class="tab active" onclick="showForm('login')">로그인</button>
+            <button class="tab" onclick="showForm('signup')">회원가입</button>
         </div>
         
         <!-- 로그인 폼 -->
-        <div id="login-form" class="form-panel active">
-            <h2 style="margin-bottom: 20px; color: #333;">로그인</h2>
-            
+        <div id="login-form" class="form active">
+            <h2>로그인</h2>
             <div class="input-group">
-                <label for="email">이메일</label>
-                <input type="email" id="email" placeholder="이메일을 입력해주세요">
+                <label>이메일</label>
+                <input type="email" id="login-email" placeholder="이메일을 입력하세요">
             </div>
-            
             <div class="input-group">
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" placeholder="비밀번호를 입력해주세요">
+                <label>비밀번호</label>
+                <input type="password" id="login-password" placeholder="비밀번호를 입력하세요">
             </div>
+            <button class="submit" onclick="login()">로그인</button>
             
-            <div class="checkbox">
-                <input type="checkbox" id="remember">
-                <label for="remember">로그인 상태 유지</label>
-            </div>
+            <div class="divider">또는</div>
             
-            <button class="btn btn-login" onclick="handleLogin()">로그인</button>
-            
-            <div class="divider"><span>또는</span></div>
-            
-            <button class="btn btn-github" onclick="loginWithGitHub()">
-                <span>GitHub</span>으로 로그인
-            </button>
+            <button class="btn-github" onclick="githubLogin()">GitHub로 로그인</button>
             
             <div class="links">
-                <a href="#" onclick="forgotPassword()">비밀번호 찾기</a>
-                <a href="#" onclick="showTab('signup')">회원가입</a>
+                <a href="#" onclick="forgotPassword()">비밀번호 찾기</a> | 
+                <a href="#" onclick="showForm('signup')">회원가입</a> | 
                 <a href="#">비회원 주문 조회</a>
             </div>
         </div>
         
         <!-- 회원가입 폼 -->
-        <div id="signup-form" class="form-panel">
-            <h2 style="margin-bottom: 20px; color: #333;">회원가입</h2>
-            
+        <div id="signup-form" class="form">
+            <h2>회원가입</h2>
             <div class="input-group">
-                <label for="university">대학생</label>
-                <input type="text" id="university" placeholder="대학생을 입력해주세요">
+                <label>대학생</label>
+                <input type="text" id="signup-university" placeholder="대학생을 입력해주세요">
             </div>
-            
             <div class="input-group">
-                <label for="username">대문</label>
-                <input type="text" id="username" placeholder="대문을 입력해주세요">
-                <small style="color: #666; font-size: 12px;">홍보 토클 여러 대상</small>
+                <label>대문</label>
+                <input type="text" id="signup-name" placeholder="대문을 입력해주세요">
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">홍보 토클 여러 대상</div>
             </div>
-            
             <div class="input-group">
-                <label for="signup-password">비밀번호</label>
+                <label>비밀번호</label>
                 <input type="password" id="signup-password" placeholder="비밀번호를 입력해주세요">
-                <small style="color: #666; font-size: 12px;">비밀번호 강의</small>
+                <div style="font-size: 12px; color: #666; margin-top: 5px;">비밀번호 강의</div>
             </div>
-            
             <div class="input-group">
-                <label for="confirm-password">비밀번호 확인</label>
-                <input type="password" id="confirm-password" placeholder="비밀번호를 다시 입력해주세요">
+                <label>비밀번호 확인</label>
+                <input type="password" id="signup-password2" placeholder="비밀번호를 다시 입력해주세요">
             </div>
-            
             <div class="input-group">
-                <label for="signup-email">이메일</label>
+                <label>이메일</label>
                 <input type="email" id="signup-email" placeholder="이메일을 입력해주세요">
             </div>
             
-            <!-- 약관 동의 -->
-            <div class="terms-box">
-                <div class="checkbox">
+            <div style="background: #f9f9f9; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                <div style="font-weight: bold; margin-bottom: 10px;">약관 동의</div>
+                <div style="margin-bottom: 5px;">
                     <input type="checkbox" id="terms-all" onclick="toggleAllTerms()">
-                    <label for="terms-all"><strong>모든 약관에 동의합니다</strong></label>
+                    <label style="display: inline; font-weight: normal;">모든 약관에 동의합니다</label>
                 </div>
-                <hr style="margin: 10px 0; border-color: #eee;">
-                <div class="checkbox">
-                    <input type="checkbox" class="term" id="terms-age" required>
-                    <label for="terms-age">만 14세 이상입니다. (필수)</label>
+                <hr style="margin: 10px 0;">
+                <div style="margin-bottom: 5px;">
+                    <input type="checkbox" class="term" id="term1" required>
+                    <label style="display: inline; font-weight: normal;">만 14세 이상입니다. (필수)</label>
                 </div>
-                <div class="checkbox">
-                    <input type="checkbox" class="term" id="terms-service" required>
-                    <label for="terms-service">서비스 이용약관 동의 (필수)</label>
+                <div style="margin-bottom: 5px;">
+                    <input type="checkbox" class="term" id="term2" required>
+                    <label style="display: inline; font-weight: normal;">서비스 이용약관 동의 (필수)</label>
                 </div>
-                <div class="checkbox">
-                    <input type="checkbox" class="term" id="terms-privacy" required>
-                    <label for="terms-privacy">개인정보 수집 및 이용 동의 (필수)</label>
+                <div style="margin-bottom: 5px;">
+                    <input type="checkbox" class="term" id="term3" required>
+                    <label style="display: inline; font-weight: normal;">개인정보 수집 및 이용 동의 (필수)</label>
                 </div>
-                <div class="checkbox">
-                    <input type="checkbox" class="term" id="terms-marketing">
-                    <label for="terms-marketing">이벤트 및 SMS 마케팅 정보 수신 동의 (선택)</label>
+                <div style="margin-bottom: 5px;">
+                    <input type="checkbox" class="term" id="term4">
+                    <label style="display: inline; font-weight: normal;">이벤트 및 SMS 마케팅 정보 수신 동의 (선택)</label>
                 </div>
             </div>
             
-            <button class="btn btn-signup" onclick="handleSignup()">회원가입</button>
+            <button class="submit" onclick="signup()">회원가입</button>
             
             <div class="links">
-                이미 계정이 있으신가요? <a href="#" onclick="showTab('login')">로그인</a>
+                이미 계정이 있으신가요? <a href="#" onclick="showForm('login')">로그인</a>
             </div>
         </div>
     </div>
 
     <script>
-        // 탭 전환 기능
-        function showTab(tabName) {
-            // 모든 탭 버튼 비활성화
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
+        // 탭 전환 함수
+        function showForm(formName) {
+            // 모든 탭 비활성화
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
             });
-            
-            // 모든 폼 숨기기
-            document.querySelectorAll('.form-panel').forEach(panel => {
-                panel.classList.remove('active');
+            document.querySelectorAll('.form').forEach(form => {
+                form.classList.remove('active');
             });
             
             // 선택한 탭 활성화
-            document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}-form`).classList.add('active');
+            document.querySelector(`button[onclick="showForm('${formName}')"]`).classList.add('active');
+            document.getElementById(formName + '-form').classList.add('active');
         }
         
-        // 로그인 처리
-        function handleLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        // 로그인 함수
+        function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
             
             if (!email || !password) {
                 alert('이메일과 비밀번호를 입력해주세요.');
                 return;
             }
             
-            console.log('로그인 시도:', email);
-            alert('로그인 기능은 Firebase 연동 후 사용 가능합니다.');
-            // 실제 구현: Firebase 로그인 함수 호출
+            alert('로그인 시도: ' + email);
+            // 실제 구현: Firebase 로그인 로직
         }
         
-        // 회원가입 처리
-        function handleSignup() {
-            const university = document.getElementById('university').value;
-            const username = document.getElementById('username').value;
+        // 회원가입 함수
+        function signup() {
+            const university = document.getElementById('signup-university').value;
+            const name = document.getElementById('signup-name').value;
             const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
+            const password2 = document.getElementById('signup-password2').value;
             const email = document.getElementById('signup-email').value;
             
             // 유효성 검사
-            if (!university || !username || !password || !confirmPassword || !email) {
+            if (!university || !name || !password || !password2 || !email) {
                 alert('모든 필수 항목을 입력해주세요.');
                 return;
             }
             
-            if (password !== confirmPassword) {
+            if (password !== password2) {
                 alert('비밀번호가 일치하지 않습니다.');
                 return;
             }
             
-            if (!document.getElementById('terms-age').checked || 
-                !document.getElementById('terms-service').checked || 
-                !document.getElementById('terms-privacy').checked) {
+            if (!document.getElementById('term1').checked || 
+                !document.getElementById('term2').checked || 
+                !document.getElementById('term3').checked) {
                 alert('필수 약관에 동의해주세요.');
                 return;
             }
             
-            console.log('회원가입 정보:', { university, username, email });
-            alert('회원가입 기능은 Firebase 연동 후 사용 가능합니다.');
-            // 실제 구현: Firebase 회원가입 함수 호출
+            alert('회원가입 정보가 제출되었습니다.\n대학생: ' + university + '\n이름: ' + name + '\n이메일: ' + email);
             
-            // 가입 후 로그인 탭으로 전환
-            showTab('login');
+            // 성공 후 로그인 탭으로 전환
+            showForm('login');
+            
+            // 폼 초기화
+            document.getElementById('signup-university').value = '';
+            document.getElementById('signup-name').value = '';
+            document.getElementById('signup-password').value = '';
+            document.getElementById('signup-password2').value = '';
+            document.getElementById('signup-email').value = '';
+            document.querySelectorAll('.term').forEach(term => term.checked = false);
+            document.getElementById('terms-all').checked = false;
         }
         
         // GitHub 로그인
-        function loginWithGitHub() {
-            console.log('GitHub OAuth 로그인 시도');
-            alert('GitHub 로그인 기능은 Firebase 연동 후 사용 가능합니다.');
-            // 실제 구현: firebase.auth().signInWithPopup(provider)
+        function githubLogin() {
+            alert('GitHub 로그인 기능 (Firebase 연동 필요)');
+            // 실제 구현: Firebase GitHub OAuth
         }
         
         // 비밀번호 찾기
         function forgotPassword() {
-            const email = prompt('비밀번호를 재설정할 이메일 주소를 입력해주세요:');
+            const email = prompt('비밀번호 재설정을 위한 이메일을 입력하세요:');
             if (email) {
-                console.log('비밀번호 재설정 요청:', email);
-                alert('비밀번호 재설정 이메일이 발송되었습니다.');
-                // 실제 구현: Firebase 비밀번호 재설정 이메일 발송
+                alert('비밀번호 재설정 링크가 ' + email + '로 전송되었습니다.');
             }
         }
         
-        // 모든 약관 동의/해제
+        // 전체 약관 동의/해제
         function toggleAllTerms() {
             const allCheckbox = document.getElementById('terms-all');
             const terms = document.querySelectorAll('.term');
@@ -385,18 +285,18 @@
         }
         
         // 개별 약관 체크 시 전체 동의 체크박스 업데이트
-        document.querySelectorAll('.term').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
+        document.querySelectorAll('.term').forEach(term => {
+            term.addEventListener('change', function() {
                 const allTerms = document.querySelectorAll('.term');
-                const allChecked = Array.from(allTerms).every(term => term.checked);
+                const allChecked = Array.from(allTerms).every(t => t.checked);
                 document.getElementById('terms-all').checked = allChecked;
             });
         });
         
-        // 페이지 로드 시 이메일 입력 필드에 포커스
-        window.onload = function() {
-            document.getElementById('email').focus();
-        };
+        // 페이지 로드 시 기본 이메일 필드에 포커스
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('login-email').focus();
+        });
     </script>
 </body>
 </html>
