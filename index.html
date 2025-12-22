@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 | 회원가입</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
     <style>
         /* 무채색 디자인 시스템 */
         :root {
@@ -264,6 +269,25 @@
             margin: 16px 0;
         }
         
+        /* GitHub 버튼 스타일 */
+        .github-btn {
+            background: #24292e !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 10px !important;
+        }
+        
+        .github-btn:hover {
+            background: #444d56 !important;
+        }
+        
+        .github-btn img {
+            filter: brightness(0) invert(1);
+            width: 20px;
+            height: 20px;
+        }
+        
         @media (max-width: 480px) {
             .auth-container {
                 border-radius: 8px;
@@ -307,6 +331,18 @@
             </div>
             
             <button class="submit-button" onclick="handleLogin()">로그인</button>
+            
+            <!-- GitHub 로그인 버튼 추가 -->
+            <div class="input-group">
+                <div class="divider">
+                    <span>또는</span>
+                </div>
+                
+                <button id="github-login-btn" class="submit-button github-btn">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
+                    GitHub으로 로그인
+                </button>
+            </div>
             
             <div class="links">
                 <a href="#" onclick="forgotPassword()">비밀번호 찾기</a>
@@ -374,6 +410,18 @@
             
             <button class="submit-button" onclick="handleSignup()">회원가입</button>
             
+            <!-- GitHub 회원가입 버튼 추가 -->
+            <div class="input-group">
+                <div class="divider">
+                    <span>또는</span>
+                </div>
+                
+                <button id="github-signup-btn" class="submit-button github-btn">
+                    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
+                    GitHub으로 회원가입
+                </button>
+            </div>
+            
             <div class="links">
                 이미 계정이 있으신가요? <a href="#" onclick="showTab('login')">로그인</a>
             </div>
@@ -381,6 +429,21 @@
     </div>
 
     <script>
+        // ========== Firebase 설정 ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1XDqgki7lKMz-EE4ZFzOLmku8EsLI0yI",
+            authDomain: "login-57c14.firebaseapp.com",
+            projectId: "login-57c14",
+            storageBucket: "login-57c14.firebasestorage.app",
+            messagingSenderId: "847658526472",
+            appId: "1:847658526472:web:05adaddfea3afff8e12ebd"
+        };
+
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        // ===================================
+
         // 탭 전환 기능
         function showTab(tabName) {
             // 모든 탭 버튼 비활성화
@@ -404,6 +467,69 @@
                 }, 100);
             }
         }
+        
+        // ========== GitHub 로그인 처리 ==========
+        function handleGitHubLogin() {
+            const provider = new firebase.auth.GithubAuthProvider();
+            
+            // 추가 권한 요청 (선택사항)
+            provider.addScope('user:email');
+            
+            auth.signInWithPopup(provider)
+                .then(function(result) {
+                    console.log('GitHub 로그인 성공:', result.user);
+                    
+                    // 사용자 정보 추출
+                    const user = result.user;
+                    const credential = result.credential;
+                    const accessToken = credential.accessToken;
+                    
+                    // 성공 메시지
+                    alert('GitHub 로그인 성공!\n환영합니다, ' + 
+                          (user.displayName || user.email || '사용자') + '님!');
+                    
+                    // 사용자 정보 콘솔에 출력 (디버깅용)
+                    console.log('사용자 정보:', {
+                        이름: user.displayName,
+                        이메일: user.email,
+                        사진: user.photoURL,
+                        UID: user.uid
+                    });
+                    
+                    // 여기에 로그인 성공 후 작업 추가
+                    // 예: 대시보드로 리디렉션, 사용자 정보 저장 등
+                    // window.location.href = '/dashboard.html';
+                    
+                }).catch(function(error) {
+                    console.error('GitHub 로그인 실패:', error);
+                    
+                    // 에러 코드별 사용자 친화적 메시지
+                    let errorMessage = 'GitHub 로그인에 실패했습니다.';
+                    
+                    switch(error.code) {
+                        case 'auth/popup-closed-by-user':
+                            errorMessage = '로그인 창이 닫혔습니다. 다시 시도해주세요.';
+                            break;
+                        case 'auth/network-request-failed':
+                            errorMessage = '네트워크 연결을 확인해주세요.';
+                            break;
+                        case 'auth/unauthorized-domain':
+                            errorMessage = '이 도메인에서 GitHub 로그인이 허용되지 않았습니다.';
+                            break;
+                        case 'auth/configuration-not-found':
+                            errorMessage = 'GitHub 로그인 설정이 완료되지 않았습니다. 관리자에게 문의해주세요.';
+                            break;
+                    }
+                    
+                    alert(errorMessage);
+                });
+        }
+        
+        // GitHub 회원가입 처리 (로그인과 동일)
+        function handleGitHubSignup() {
+            handleGitHubLogin(); // 같은 기능 사용
+        }
+        // ======================================
         
         // 로그인 처리
         function handleLogin() {
@@ -430,12 +556,14 @@
                 return;
             }
             
-            console.log('로그인 시도:', email);
+            console.log('이메일 로그인 시도:', email);
             
-            // 여기에 실제 Firebase 로그인 로직 구현
-            // 예: firebase.auth().signInWithEmailAndPassword(email, password)
+            // TODO: Firebase 이메일 로그인 구현
+            // firebase.auth().signInWithEmailAndPassword(email, password)
+            //   .then((userCredential) => { ... })
+            //   .catch((error) => { ... });
             
-            alert('로그인 기능은 Firebase 연동 후 사용 가능합니다.');
+            alert('이메일 로그인 기능은 Firebase 연동 후 사용 가능합니다.\n지금은 GitHub 로그인을 이용해주세요.');
         }
         
         // 회원가입 처리
@@ -489,25 +617,17 @@
                 return;
             }
             
-            console.log('회원가입 정보:', { 
+            console.log('이메일 회원가입 정보:', { 
                 email, 
                 username
             });
             
-            // 여기에 실제 Firebase 회원가입 로직 구현
-            // 예: firebase.auth().createUserWithEmailAndPassword(email, password)
+            // TODO: Firebase 이메일 회원가입 구현
+            // firebase.auth().createUserWithEmailAndPassword(email, password)
+            //   .then((userCredential) => { ... })
+            //   .catch((error) => { ... });
             
-            alert('회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.');
-            
-            // 성공 후 로그인 탭으로 전환
-            showTab('login');
-            
-            // 로그인 폼에 이메일 자동 입력
-            document.getElementById('email').value = email;
-            
-            // 회원가입 폼 초기화
-            document.getElementById('signup-form').reset();
-            document.getElementById('terms-all').checked = false;
+            alert('이메일 회원가입 기능은 Firebase 연동 후 사용 가능합니다.\n지금은 GitHub 회원가입을 이용해주세요.');
         }
         
         // 비밀번호 찾기
@@ -518,10 +638,12 @@
                 if (emailRegex.test(email)) {
                     console.log('비밀번호 재설정 요청:', email);
                     
-                    // 여기에 Firebase 비밀번호 재설정 로직 구현
-                    // 예: firebase.auth().sendPasswordResetEmail(email)
+                    // TODO: Firebase 비밀번호 재설정 구현
+                    // firebase.auth().sendPasswordResetEmail(email)
+                    //   .then(() => { ... })
+                    //   .catch((error) => { ... });
                     
-                    alert('비밀번호 재설정 이메일이 발송되었습니다. 이메일을 확인해주세요.');
+                    alert('비밀번호 재설정 기능은 Firebase 연동 후 사용 가능합니다.');
                 } else {
                     alert('올바른 이메일 형식을 입력해주세요.');
                 }
@@ -538,22 +660,51 @@
             });
         }
         
-        // 개별 약관 체크 시 전체 동의 체크박스 업데이트
-        document.querySelectorAll('.term').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const allTerms = document.querySelectorAll('.term');
-                const allChecked = Array.from(allTerms).every(term => term.checked);
-                document.getElementById('terms-all').checked = allChecked;
-            });
+        // ========== Firebase 인증 상태 감지 ==========
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // 사용자가 로그인한 상태
+                console.log('현재 로그인된 사용자:', {
+                    이름: user.displayName,
+                    이메일: user.email,
+                    UID: user.uid,
+                    제공업체: user.providerId
+                });
+                
+                // 로그인 성공 시 추가 작업 (필요시)
+                // 예: 상단에 사용자 정보 표시, 특정 기능 활성화 등
+                
+            } else {
+                // 사용자가 로그아웃한 상태
+                console.log('로그아웃 상태');
+            }
         });
+        // ============================================
         
-        // 페이지 로드 시 이메일 입력 필드에 포커스
-        window.addEventListener('load', function() {
-            document.getElementById('email').focus();
-        });
-        
-        // 폼 제출 방지 (기본 폼 동작 방지)
+        // 이벤트 리스너 설정
         document.addEventListener('DOMContentLoaded', function() {
+            // GitHub 버튼 이벤트 리스너
+            const githubLoginBtn = document.getElementById('github-login-btn');
+            const githubSignupBtn = document.getElementById('github-signup-btn');
+            
+            if (githubLoginBtn) {
+                githubLoginBtn.addEventListener('click', handleGitHubLogin);
+            }
+            
+            if (githubSignupBtn) {
+                githubSignupBtn.addEventListener('click', handleGitHubSignup);
+            }
+            
+            // 개별 약관 체크 시 전체 동의 체크박스 업데이트
+            document.querySelectorAll('.term').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const allTerms = document.querySelectorAll('.term');
+                    const allChecked = Array.from(allTerms).every(term => term.checked);
+                    document.getElementById('terms-all').checked = allChecked;
+                });
+            });
+            
+            // 폼 제출 방지 (기본 폼 동작 방지)
             const forms = document.querySelectorAll('.form-panel');
             forms.forEach(form => {
                 form.addEventListener('submit', function(e) {
@@ -572,6 +723,13 @@
                     }
                 }
             });
+            
+            // 페이지 로드 시 이메일 입력 필드에 포커스
+            document.getElementById('email').focus();
+            
+            // 현재 Firebase GitHub 설정 상태 알림
+            console.log('현재 상태: Firebase GitHub 설정은 임시값(123,456)으로 되어 있습니다.');
+            console.log('GitHub 로그인 테스트는 내일 GitHub Secret 정상 생성 후 가능합니다.');
         });
     </script>
 </body>
