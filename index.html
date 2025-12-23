@@ -108,7 +108,7 @@
         }
         
         .input-group {
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
         
         .input-label {
@@ -338,7 +338,7 @@
                     <span>또는</span>
                 </div>
                 
-                <button id="github-login-btn" class="submit-button github-btn">
+                <button id="github-login-btn" class="submit-button github-btn" onclick="handleGitHubLogin()">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
                     GitHub으로 로그인
                 </button>
@@ -359,10 +359,17 @@
                 <input type="email" id="signup-email" class="input-field" placeholder="이메일을 입력해주세요">
             </div>
             
+            <!-- 이름 항목 (사용자 이름 -> 이름으로 변경) -->
             <div class="input-group">
-                <label class="input-label required" for="username">사용자 이름</label>
-                <input type="text" id="username" class="input-field" placeholder="사용자 이름을 입력해주세요">
-                <span class="field-note">홍보 및 마케팅에 사용될 이름입니다</span>
+                <label class="input-label required" for="username">이름</label>
+                <input type="text" id="username" class="input-field" placeholder="이름을 입력해주세요">
+            </div>
+            
+            <!-- 핸드폰 번호 항목 추가 -->
+            <div class="input-group">
+                <label class="input-label" for="phone">핸드폰 번호</label>
+                <input type="tel" id="phone" class="input-field" placeholder="예) 010-1234-5678">
+                <span class="field-note">하이픈(-)을 포함하여 입력해주세요</span>
             </div>
             
             <div class="input-group">
@@ -416,7 +423,7 @@
                     <span>또는</span>
                 </div>
                 
-                <button id="github-signup-btn" class="submit-button github-btn">
+                <button id="github-signup-btn" class="submit-button github-btn" onclick="handleGitHubSignup()">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
                     GitHub으로 회원가입
                 </button>
@@ -432,7 +439,7 @@
         // ========== Firebase 설정 ==========
         const firebaseConfig = {
             apiKey: "AIzaSyC1XDqgki7lKMz-EE4ZFzOLmku8EsLI0yI",
-            authDomain: "thebestys.github.io",
+            authDomain: "thebestys.github.io",  // GitHub Pages 도메인으로 설정
             projectId: "login-57c14",
             storageBucket: "login-57c14.firebasestorage.app",
             messagingSenderId: "847658526472",
@@ -444,31 +451,7 @@
         const auth = firebase.auth();
         // ===================================
 
-        // 탭 전환 기능
-        function showTab(tabName) {
-            // 모든 탭 버튼 비활성화
-            document.querySelectorAll('.tab-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // 모든 폼 숨기기
-            document.querySelectorAll('.form-panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            
-            // 선택한 탭 활성화
-            document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}-form`).classList.add('active');
-            
-            // 회원가입 탭으로 이동 시 이메일 필드에 포커스
-            if (tabName === 'signup') {
-                setTimeout(() => {
-                    document.getElementById('signup-email').focus();
-                }, 100);
-            }
-        }
-        
-        // ========== GitHub 로그인 처리 ==========
+        // ========== GitHub 로그인 처리 함수 ==========
         function handleGitHubLogin() {
             const provider = new firebase.auth.GithubAuthProvider();
             
@@ -481,8 +464,6 @@
                     
                     // 사용자 정보 추출
                     const user = result.user;
-                    const credential = result.credential;
-                    const accessToken = credential.accessToken;
                     
                     // 성공 메시지
                     alert('GitHub 로그인 성공!\n환영합니다, ' + 
@@ -530,6 +511,30 @@
             handleGitHubLogin(); // 같은 기능 사용
         }
         // ======================================
+
+        // 탭 전환 기능
+        function showTab(tabName) {
+            // 모든 탭 버튼 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // 모든 폼 숨기기
+            document.querySelectorAll('.form-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // 선택한 탭 활성화
+            document.querySelector(`button[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-form`).classList.add('active');
+            
+            // 회원가입 탭으로 이동 시 이메일 필드에 포커스
+            if (tabName === 'signup') {
+                setTimeout(() => {
+                    document.getElementById('signup-email').focus();
+                }, 100);
+            }
+        }
         
         // 로그인 처리
         function handleLogin() {
@@ -570,6 +575,7 @@
         function handleSignup() {
             const email = document.getElementById('signup-email').value.trim();
             const username = document.getElementById('username').value.trim();
+            const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('signup-password').value.trim();
             const confirmPassword = document.getElementById('confirm-password').value.trim();
             
@@ -609,6 +615,13 @@
                 return;
             }
             
+            // 핸드폰 번호 형식 검사 (입력된 경우에만)
+            if (phone && !/^\d{3}-\d{3,4}-\d{4}$/.test(phone)) {
+                alert('올바른 핸드폰 번호 형식을 입력해주세요. (예: 010-1234-5678)');
+                document.getElementById('phone').focus();
+                return;
+            }
+            
             // 필수 약관 동의 검사
             if (!document.getElementById('terms-age').checked || 
                 !document.getElementById('terms-service').checked || 
@@ -617,9 +630,11 @@
                 return;
             }
             
-            console.log('이메일 회원가입 정보:', { 
+            console.log('회원가입 정보:', { 
                 email, 
-                username
+                username,
+                phone,
+                password: '***' // 보안상 비밀번호는 로그하지 않음
             });
             
             // TODO: Firebase 이메일 회원가입 구현
@@ -683,17 +698,7 @@
         
         // 이벤트 리스너 설정
         document.addEventListener('DOMContentLoaded', function() {
-            // GitHub 버튼 이벤트 리스너
-            const githubLoginBtn = document.getElementById('github-login-btn');
-            const githubSignupBtn = document.getElementById('github-signup-btn');
-            
-            if (githubLoginBtn) {
-                githubLoginBtn.addEventListener('click', handleGitHubLogin);
-            }
-            
-            if (githubSignupBtn) {
-                githubSignupBtn.addEventListener('click', handleGitHubSignup);
-            }
+            // GitHub 버튼 이벤트 리스너는 onclick 속성으로 대체
             
             // 개별 약관 체크 시 전체 동의 체크박스 업데이트
             document.querySelectorAll('.term').forEach(checkbox => {
@@ -727,9 +732,9 @@
             // 페이지 로드 시 이메일 입력 필드에 포커스
             document.getElementById('email').focus();
             
-            // 현재 Firebase GitHub 설정 상태 알림
-            console.log('현재 상태: Firebase GitHub 설정은 임시값(123,456)으로 되어 있습니다.');
-            console.log('GitHub 로그인 테스트는 내일 GitHub Secret 정상 생성 후 가능합니다.');
+            // Firebase 초기화 확인
+            console.log('Firebase 앱이 성공적으로 초기화되었습니다.');
+            console.log('authDomain 설정:', firebaseConfig.authDomain);
         });
     </script>
 </body>
