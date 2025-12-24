@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>로컬 테스트</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <h2>로컬 Firestore 테스트</h2>
+    <button onclick="testFirestore()" style="padding:15px;background:blue;color:white;border:none;font-size:18px;">
+        🔥 여기를 클릭하세요!
+    </button>
+    <div id="result" style="margin-top:20px;"></div>
+
+    <script>
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1XDqgki7lKMz-EE4ZFzOLmku8EsLI0yI",
+            authDomain: "login-57c14.firebaseapp.com",
+            projectId: "login-57c14",
+            storageBucket: "login-57c14.firebasestorage.app",
+            messagingSenderId: "847658526472",
+            appId: "1:847658526472:web:05adaddfea3afff8e12ebd"
+        };
+        
+        // Firebase 초기화
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        console.log("✅ Firestore 준비 완료");
+
+        async function testFirestore() {
+            const result = document.getElementById('result');
+            result.innerHTML = '테스트 중...';
+            
+            try {
+                // 1. Firestore에서 데이터 불러오기
+                const doc = await db.collection('ashop_users').doc('test_user_001').get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    result.innerHTML = `
+                        <div style="background:#d4edda;padding:20px;border-radius:8px;">
+                            <h3>🎉 Firestore 연결 성공!</h3>
+                            <p><strong>이름:</strong> ${data.name}</p>
+                            <p><strong>이메일:</strong> ${data.이메일}</p>
+                            <p><strong>핸드폰:</strong> ${data['핸드폰 번호']}</p>
+                            <p><strong>가입일:</strong> ${data.가입일?.toDate?.().toLocaleString()}</p>
+                        </div>
+                    `;
+                    console.log('📊 데이터:', data);
+                } else {
+                    result.innerHTML = '<p style="color:red;">❌ 문서를 찾을 수 없습니다.</p>';
+                }
+            } catch (error) {
+                result.innerHTML = `<p style="color:red;">❌ 에러: ${error.message}</p>`;
+                console.error('💥 에러:', error);
+            }
+        }
+        
+        console.log("🔄 페이지 로드 완료, 버튼을 클릭하세요!");
+    </script>
+</body>
+</html>
