@@ -3,206 +3,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A-Shop - 회원가입</title>
+    <title>A-Shop | 사용자 관리</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --bronze: #cd7f32;
+            --silver: #c0c0c0;
+            --gold: #ffd700;
+            --platinum: #e5e4e2;
+            --diamond: #b9f2ff;
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--gray-50);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
             padding: 20px;
         }
         
-        .login-container {
-            max-width: 500px;
-            width: 100%;
+        .container-main {
+            max-width: 1200px;
             margin: 0 auto;
         }
         
-        .login-card {
+        /* 헤더 스타일 */
+        .app-header {
             background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
+        .header-title {
+            color: var(--gray-900);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
         
-        .logo h2 {
-            color: #2c3e50;
-            font-weight: 700;
+        .header-subtitle {
+            color: var(--gray-500);
+            font-size: 14px;
         }
         
-        .logo p {
-            color: #7f8c8d;
+        /* 카드 스타일 */
+        .card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            padding: 20px 24px;
+        }
+        
+        .card-title {
+            color: var(--gray-900);
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 24px;
+        }
+        
+        /* 탭 스타일 */
+        .nav-tabs {
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 24px;
+            background-color: var(--gray-50);
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            padding: 16px 24px;
+            color: var(--gray-600);
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--gray-900);
+            background-color: white;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--gray-900);
+            background-color: white;
+            border-bottom-color: var(--gray-800);
+        }
+        
+        .tab-content {
+            padding: 0;
+        }
+        
+        /* 폼 스타일 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: var(--gray-700);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
         
         .form-control {
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--gray-900);
+            background-color: white;
+            transition: border-color 0.15s ease;
         }
         
         .form-control:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            outline: none;
+            border-color: var(--gray-500);
+            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
         }
         
-        .btn-login {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        /* 버튼 스타일 */
+        .btn {
+            padding: 10px 20px;
             border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1.1rem;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--gray-800);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--gray-900);
+        }
+        
+        .btn-secondary {
+            background-color: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--gray-50);
+        }
+        
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        
+        /* 테이블 스타일 */
+        .table {
             width: 100%;
-            margin-top: 10px;
-            transition: transform 0.3s;
+            border-collapse: collapse;
         }
         
-        .btn-login:hover {
-            transform: translateY(-2px);
+        .table th {
+            background-color: var(--gray-50);
+            color: var(--gray-700);
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 12px 16px;
+            border-bottom: 2px solid var(--gray-200);
+            text-align: left;
         }
         
-        .admin-link {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+        .table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            font-size: 14px;
         }
         
-        .admin-link a {
-            color: #667eea;
-            text-decoration: none;
+        .table tr:hover {
+            background-color: var(--gray-50);
+        }
+        
+        /* 뱃지 스타일 */
+        .tier-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .tier-bronze {
+            background-color: var(--bronze);
+            color: white;
+        }
+        
+        .tier-silver {
+            background-color: var(--silver);
+            color: var(--gray-800);
+        }
+        
+        .tier-gold {
+            background-color: var(--gold);
+            color: var(--gray-800);
+        }
+        
+        .tier-platinum {
+            background-color: var(--platinum);
+            color: var(--gray-800);
+        }
+        
+        .tier-diamond {
+            background-color: var(--diamond);
+            color: var(--gray-800);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
         }
         
-        .admin-link a:hover {
-            text-decoration: underline;
+        .status-active {
+            background-color: #d1fae5;
+            color: #065f46;
         }
         
+        .status-inactive {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* 메시지 스타일 */
         .alert {
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 6px;
             margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .alert-success {
+            background-color: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+        
+        .alert-info {
+            background-color: #dbeafe;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+        
+        /* 체크박스/라디오 */
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .form-check-input {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .form-check-label {
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+        
+        /* 등급 선택 */
+        .tier-selector {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .tier-option {
+            padding: 12px;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .tier-option:hover {
+            border-color: var(--gray-500);
+            background-color: var(--gray-50);
+        }
+        
+        .tier-option.selected {
+            border-color: var(--gray-800);
+            background-color: var(--gray-800);
+            color: white;
+        }
+        
+        .tier-option-name {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        
+        .tier-option-points {
+            font-size: 11px;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <div class="login-card">
-            <div class="logo">
-                <h2>📦 A-Shop</h2>
-                <p>회원가입을 진행해주세요</p>
+    <div class="container-main">
+        <!-- 헤더 -->
+        <div class="app-header">
+            <h1 class="header-title">A-Shop 사용자 관리 시스템</h1>
+            <p class="header-subtitle">Firebase Authentication + Firestore 연동 시스템</p>
+        </div>
+        
+        <!-- 메인 컨텐츠 -->
+        <div class="card">
+            <!-- 탭 네비게이션 -->
+            <div class="nav-tabs">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="login-tab" data-tab="login">
+                            <i class="fas fa-sign-in-alt me-2"></i>로그인
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="signup-tab" data-tab="signup">
+                            <i class="fas fa-user-plus me-2"></i>회원가입
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="users-tab" data-tab="users">
+                            <i class="fas fa-users me-2"></i>사용자 목록
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="admin-tab" data-tab="admin">
+                            <i class="fas fa-cog me-2"></i>관리자
+                        </button>
+                    </li>
+                </ul>
             </div>
             
-            <div id="message" class="alert alert-info" style="display: none;">
-                <!-- 메시지 표시 영역 -->
-            </div>
-            
-            <form id="signupForm">
-                <div class="row">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" id="displayName" placeholder="이름" required>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" id="username" placeholder="사용자 ID" required>
-                    </div>
-                </div>
-                
-                <input type="email" class="form-control" id="email" placeholder="이메일 주소" required>
-                
-                <input type="tel" class="form-control" id="phone" placeholder="전화번호 (010-1234-5678)" required>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <select class="form-control" id="tier" required>
-                            <option value="" disabled selected>회원 등급 선택</option>
-                            <option value="bronze">브론즈 (0-999 포인트)</option>
-                            <option value="silver">실버 (1,000-4,999 포인트)</option>
-                            <option value="gold">골드 (5,000-9,999 포인트)</option>
-                            <option value="platinum">플래티넘 (10,000-24,999 포인트)</option>
-                            <option value="diamond">다이아몬드 (25,000+ 포인트)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <input type="number" class="form-control" id="points" placeholder="초기 포인트" value="1000" min="0" max="100000" required>
+            <!-- 탭 내용 -->
+            <div class="tab-content">
+                <!-- 로그인 탭 -->
+                <div id="login-content" class="tab-pane active">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">로그인</h3>
+                        <div id="login-message" class="alert" style="display: none;"></div>
+                        
+                        <form id="loginForm">
+                            <div class="form-group">
+                                <label class="form-label" for="login-email">이메일</label>
+                                <input type="email" id="login-email" class="form-control" placeholder="you@example.com" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="login-password">비밀번호</label>
+                                <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>로그인
+                            </button>
+                        </form>
                     </div>
                 </div>
                 
-                <div class="form-check mt-3">
-                    <input class="form-check-input" type="checkbox" id="emailVerified" checked>
-                    <label class="form-check-label" for="emailVerified">
-                        이메일 인증 완료
-                    </label>
+                <!-- 회원가입 탭 -->
+                <div id="signup-content" class="tab-pane">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">회원가입</h3>
+                        <div id="signup-message" class="alert" style="display: none;"></div>
+                        
+                        <form id="signupForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="signup-displayName">이름</label>
+                                    <input type="text" id="signup-displayName" class="form-control" placeholder="홍길동" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="signup-username">사용자 ID</label>
+                                    <input type="text" id="signup-username" class="form-control" placeholder="honggildong" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="signup-email">이메일</label>
+                                <input type="email" id="signup-email" class="form-control" placeholder="you@example.com" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="signup-phone">전화번호</label>
+                                <input type="tel" id="signup-phone" class="form-control" placeholder="010-1234-5678" required>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label" for="signup-password">비밀번호</label>
+                                    <input type="password" id="signup-password" class="form-control" placeholder="••••••••" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="signup-confirmPassword">비밀번호 확인</label>
+                                    <input type="password" id="signup-confirmPassword" class="form-control" placeholder="••••••••" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">회원 등급</label>
+                                <div class="tier-selector">
+                                    <div class="tier-option" data-tier="bronze">
+                                        <div class="tier-option-name">브론즈</div>
+                                        <div class="tier-option-points">0-999P</div>
+                                    </div>
+                                    <div class="tier-option" data-tier="silver">
+                                        <div class="tier-option-name">실버</div>
+                                        <div class="tier-option-points">1,000-4,999P</div>
+                                    </div>
+                                    <div class="tier-option" data-tier="gold">
+                                        <div class="tier-option-name">골드</div>
+                                        <div class="tier-option-points">5,000-9,999P</div>
+                                    </div>
+                                    <div class="tier-option" data-tier="platinum">
+                                        <div class="tier-option-name">플래티넘</div>
+                                        <div class="tier-option-points">10,000-24,999P</div>
+                                    </div>
+                                    <div class="tier-option" data-tier="diamond">
+                                        <div class="tier-option-name">다이아몬드</div>
+                                        <div class="tier-option-points">25,000+P</div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="signup-tier" value="bronze" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">가입 방법</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="signup-method" id="signup-method-email" value="email" checked>
+                                    <label class="form-check-label" for="signup-method-email">
+                                        이메일 가입
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="signup-method" id="signup-method-github" value="github">
+                                    <label class="form-check-label" for="signup-method-github">
+                                        GitHub 가입
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">마케팅 수신 동의</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="signup-email-marketing" checked>
+                                    <label class="form-check-label" for="signup-email-marketing">
+                                        이메일 수신 동의
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="signup-sms-marketing">
+                                    <label class="form-check-label" for="signup-sms-marketing">
+                                        SMS 수신 동의
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>회원가입 완료
+                            </button>
+                        </form>
+                    </div>
                 </div>
                 
-                <div class="mt-4">
-                    <h6>마케팅 수신 동의</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="emailMarketing" checked>
-                                <label class="form-check-label" for="emailMarketing">
-                                    이메일 수신 동의
-                                </label>
+                <!-- 사용자 목록 탭 -->
+                <div id="users-content" class="tab-pane">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="card-title mb-0">사용자 목록</h3>
+                            <button class="btn btn-secondary" id="refresh-users">
+                                <i class="fas fa-sync-alt me-2"></i>새로고침
+                            </button>
+                        </div>
+                        
+                        <div id="users-message" class="alert" style="display: none;"></div>
+                        
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>이름</th>
+                                        <th>이메일</th>
+                                        <th>등급</th>
+                                        <th>포인트</th>
+                                        <th>상태</th>
+                                        <th>가입일</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <!-- 데이터가 여기에 로드됩니다 -->
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                                                <span class="visually-hidden">로딩 중...</span>
+                                            </div>
+                                            <span class="ms-2">사용자 데이터를 불러오는 중...</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 관리자 탭 -->
+                <div id="admin-content" class="tab-pane">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">관리자 기능</h3>
+                        <div id="admin-message" class="alert" style="display: none;"></div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">총 사용자</h5>
+                                        <h2 id="total-users-count" class="mb-0">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">활성 사용자</h5>
+                                        <h2 id="active-users-count" class="mb-0">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">총 포인트</h5>
+                                        <h2 id="total-points-count" class="mb-0">0</h2>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="smsMarketing">
-                                <label class="form-check-label" for="smsMarketing">
-                                    SMS 수신 동의
-                                </label>
+                        
+                        <div class="mb-4">
+                            <h5 class="mb-3">데이터 관리</h5>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-secondary" id="export-csv">
+                                    <i class="fas fa-download me-2"></i>CSV 내보내기
+                                </button>
+                                <button class="btn btn-secondary" id="export-json">
+                                    <i class="fas fa-file-export me-2"></i>JSON 내보내기
+                                </button>
+                                <button class="btn btn-danger" id="delete-all-data">
+                                    <i class="fas fa-trash me-2"></i>모든 데이터 삭제
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5 class="mb-3">Firebase 설정</h5>
+                            <div class="alert alert-info">
+                                <small>
+                                    <strong>현재 Firebase 프로젝트:</strong><br>
+                                    <span id="firebase-project-id">로드 중...</span>
+                                </small>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="mt-4">
-                    <h6>가입 방법</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="signupMethod" id="emailMethod" value="email" checked>
-                                <label class="form-check-label" for="emailMethod">
-                                    이메일 가입
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="signupMethod" id="githubMethod" value="github">
-                                <label class="form-check-label" for="githubMethod">
-                                    GitHub 가입
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-login mt-4">
-                    📝 회원가입 완료
-                </button>
-            </form>
-            
-            <div class="admin-link">
-                <a href="admin.html">🔧 관리자 페이지로 이동</a>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs (실제 키로 교체 필요) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <script>
-        // Firebase 구성 (여기에 실제 구성 추가)
+        // ==================== Firebase 설정 ====================
         const firebaseConfig = {
             apiKey: "YOUR_API_KEY",
             authDomain: "YOUR_AUTH_DOMAIN",
@@ -214,11 +651,163 @@
 
         // Firebase 초기화
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // 폼 제출 처리
-        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+        // 프로젝트 ID 표시
+        document.getElementById('firebase-project-id').textContent = firebaseConfig.projectId;
+        
+        // ==================== 전역 변수 ====================
+        let currentUser = null;
+        
+        // ==================== 유틸리티 함수 ====================
+        function showMessage(elementId, text, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = text;
+            element.className = `alert alert-${type}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function formatDate(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+        
+        function formatTier(tier) {
+            const tierMap = {
+                bronze: '브론즈',
+                silver: '실버',
+                gold: '골드',
+                platinum: '플래티넘',
+                diamond: '다이아몬드'
+            };
+            return tierMap[tier] || tier;
+        }
+        
+        function getTierClass(tier) {
+            return `tier-badge tier-${tier}`;
+        }
+        
+        // ==================== 탭 전환 ====================
+        document.querySelectorAll('.nav-link').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 모든 탭 비활성화
+                document.querySelectorAll('.nav-link').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+                
+                // 선택한 탭 활성화
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+                
+                // 특정 탭 로드
+                if (tabId === 'users') {
+                    loadUsers();
+                } else if (tabId === 'admin') {
+                    loadAdminStats();
+                }
+            });
+        });
+        
+        // ==================== 등급 선택 ====================
+        document.querySelectorAll('.tier-option').forEach(option => {
+            option.addEventListener('click', () => {
+                document.querySelectorAll('.tier-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                document.getElementById('signup-tier').value = option.getAttribute('data-tier');
+            });
+        });
+        
+        // ==================== 로그인 처리 ====================
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '로그인 중...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Firebase Authentication 로그인
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                currentUser = userCredential.user;
+                
+                // Firestore에서 사용자 정보 업데이트
+                await db.collection('ashop_users').doc(currentUser.uid).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'active'
+                });
+                
+                showMessage('login-message', '✅ 로그인 성공!', 'success');
+                
+                // 사용자 목록 새로고침
+                loadUsers();
+                loadAdminStats();
+                
+                // 사용자 탭으로 이동
+                document.getElementById('users-tab').click();
+                
+            } catch (error) {
+                console.error('로그인 오류:', error);
+                
+                let errorMessage = '로그인 중 오류가 발생했습니다.';
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = '존재하지 않는 이메일입니다.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = '비밀번호가 올바르지 않습니다.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = '유효하지 않은 이메일 형식입니다.';
+                        break;
+                }
+                
+                showMessage('login-message', `❌ ${errorMessage}`, 'error');
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+        
+        // ==================== 회원가입 처리 ====================
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // 비밀번호 확인
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showMessage('signup-message', '❌ 비밀번호가 일치하지 않습니다.', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('signup-message', '❌ 비밀번호는 6자 이상이어야 합니다.', 'error');
+                return;
+            }
+            
+            const displayName = document.getElementById('signup-displayName').value;
+            const username = document.getElementById('signup-username').value;
+            const email = document.getElementById('signup-email').value;
+            const phone = document.getElementById('signup-phone').value;
+            const tier = document.getElementById('signup-tier').value;
+            const emailMarketing = document.getElementById('signup-email-marketing').checked;
+            const smsMarketing = document.getElementById('signup-sms-marketing').checked;
+            const signupMethod = document.querySelector('input[name="signup-method"]:checked').value;
             
             const submitBtn = e.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.textContent;
@@ -226,67 +815,210 @@
             submitBtn.disabled = true;
             
             try {
-                // 사용자 데이터 수집
-                const userData = {
-                    uid: 'user-' + Date.now(), // 임시 UID (실제로는 Firebase Auth UID 사용)
-                    displayName: document.getElementById('displayName').value,
-                    username: document.getElementById('username').value,
-                    email: document.getElementById('email').value,
-                    phone: document.getElementById('phone').value,
-                    tier: document.getElementById('tier').value,
-                    points: parseInt(document.getElementById('points').value),
+                // 1. Firebase Authentication으로 사용자 생성
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // 2. Firestore에 사용자 정보 저장
+                await db.collection('ashop_users').doc(user.uid).set({
+                    uid: user.uid,
+                    email: email,
+                    username: username,
+                    displayName: displayName,
+                    phone: phone,
+                    tier: tier,
+                    points: 1000, // 기본 포인트
                     status: "active",
-                    signupMethod: document.querySelector('input[name="signupMethod"]:checked').value,
-                    emailVerified: document.getElementById('emailVerified').checked,
+                    signupMethod: signupMethod,
+                    emailVerified: false,
                     marketingAgreed: {
-                        email: document.getElementById('emailMarketing').checked,
-                        sms: document.getElementById('smsMarketing').checked
+                        email: emailMarketing,
+                        sms: smsMarketing
                     },
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    lastLogin: new Date().toISOString()
-                };
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
-                // Firestore에 저장
-                await db.collection('ashop_users').add(userData);
+                // 3. 이메일 인증 메일 전송
+                await user.sendEmailVerification();
                 
-                // 성공 메시지
-                showMessage('✅ 회원가입이 완료되었습니다!', 'success');
+                showMessage('signup-message', '✅ 회원가입이 완료되었습니다! 이메일 인증 메일을 확인해주세요.', 'success');
                 
-                // 폼 초기화
-                this.reset();
-                document.getElementById('points').value = 1000;
-                document.getElementById('emailVerified').checked = true;
-                document.getElementById('emailMarketing').checked = true;
+                // 4. 폼 초기화
+                e.target.reset();
+                document.querySelector('.tier-option[data-tier="bronze"]').click();
+                document.getElementById('signup-email-marketing').checked = true;
                 
-                // 3초 후 관리자 페이지로 이동 (선택사항)
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 3000);
+                // 5. 사용자 목록 새로고침
+                loadUsers();
+                loadAdminStats();
                 
             } catch (error) {
-                console.error('Error saving user:', error);
-                showMessage('❌ 오류가 발생했습니다: ' + error.message, 'danger');
+                console.error('회원가입 오류:', error);
+                
+                let errorMessage = '회원가입 중 오류가 발생했습니다.';
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = '이미 사용 중인 이메일입니다.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = '유효하지 않은 이메일 형식입니다.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = '비밀번호가 너무 약합니다.';
+                        break;
+                }
+                
+                showMessage('signup-message', `❌ ${errorMessage}`, 'error');
             } finally {
                 submitBtn.textContent = originalText;
                 submitBtn.disabled = false;
             }
         });
         
-        // 메시지 표시 함수
-        function showMessage(text, type) {
-            const messageDiv = document.getElementById('message');
-            messageDiv.textContent = text;
-            messageDiv.className = `alert alert-${type}`;
-            messageDiv.style.display = 'block';
+        // ==================== 사용자 목록 로드 ====================
+        async function loadUsers() {
+            const tbody = document.getElementById('users-table-body');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                            <span class="visually-hidden">로딩 중...</span>
+                        </div>
+                        <span class="ms-2">사용자 데이터를 불러오는 중...</span>
+                    </td>
+                </tr>
+            `;
             
-            setTimeout(() => {
-                messageDiv.style.display = 'none';
-            }, 5000);
+            try {
+                const querySnapshot = await db.collection('ashop_users').orderBy('createdAt', 'desc').get();
+                
+                if (querySnapshot.empty) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">
+                                등록된 사용자가 없습니다.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    html += `
+                        <tr>
+                            <td>
+                                <strong>${user.displayName}</strong><br>
+                                <small class="text-muted">${user.username}</small>
+                            </td>
+                            <td>${user.email}</td>
+                            <td><span class="${getTierClass(user.tier)}">${formatTier(user.tier)}</span></td>
+                            <td><strong>${user.points.toLocaleString()} P</strong></td>
+                            <td><span class="status-badge status-${user.status}">${user.status === 'active' ? '활성' : '비활성'}</span></td>
+                            <td>${formatDate(user.createdAt)}</td>
+                        </tr>
+                    `;
+                });
+                
+                tbody.innerHTML = html;
+                
+            } catch (error) {
+                console.error('사용자 목록 로드 오류:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-danger">
+                            ❌ 데이터를 불러오는 중 오류가 발생했습니다.
+                        </td>
+                    </tr>
+                `;
+            }
         }
         
-        // 전화번호 자동 포맷팅
-        document.getElementById('phone').addEventListener('input', function(e) {
+        // ==================== 관리자 통계 로드 ====================
+        async function loadAdminStats() {
+            try {
+                const querySnapshot = await db.collection('ashop_users').get();
+                
+                let totalUsers = 0;
+                let activeUsers = 0;
+                let totalPoints = 0;
+                
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    totalUsers++;
+                    if (user.status === 'active') activeUsers++;
+                    totalPoints += user.points || 0;
+                });
+                
+                document.getElementById('total-users-count').textContent = totalUsers;
+                document.getElementById('active-users-count').textContent = activeUsers;
+                document.getElementById('total-points-count').textContent = totalPoints.toLocaleString();
+                
+            } catch (error) {
+                console.error('통계 로드 오류:', error);
+            }
+        }
+        
+        // ==================== 데이터 내보내기 ====================
+        document.getElementById('export-csv').addEventListener('click', async () => {
+            try {
+                const querySnapshot = await db.collection('ashop_users').get();
+                const users = [];
+                
+                querySnapshot.forEach((doc) => {
+                    users.push(doc.data());
+                });
+                
+                if (users.length === 0) {
+                    showMessage('admin-message', '❌ 내보낼 데이터가 없습니다.', 'error');
+                    return;
+                }
+                
+                // CSV 변환
+                const headers = ['이름', '이메일', '전화번호', '등급', '포인트', '상태', '가입일'];
+                const rows = users.map(user => [
+                    user.displayName,
+                    user.email,
+                    user.phone,
+                    formatTier(user.tier),
+                    user.points,
+                    user.status === 'active' ? '활성' : '비활성',
+                    formatDate(user.createdAt)
+                ]);
+                
+                const csvContent = [headers, ...rows]
+                    .map(row => row.map(cell => `"${cell}"`).join(','))
+                    .join('\n');
+                
+                // 파일 다운로드
+                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `ashop_users_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showMessage('admin-message', '✅ CSV 파일이 다운로드되었습니다.', 'success');
+                
+            } catch (error) {
+                console.error('CSV 내보내기 오류:', error);
+                showMessage('admin-message', '❌ 내보내기 중 오류가 발생했습니다.', 'error');
+            }
+        });
+        
+        // ==================== 새로고침 버튼 ====================
+        document.getElementById('refresh-users').addEventListener('click', loadUsers);
+        
+        // ==================== 전화번호 포맷팅 ====================
+        document.getElementById('signup-phone').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length > 3 && value.length <= 7) {
                 value = value.replace(/(\d{3})(\d+)/, '$1-$2');
@@ -294,6 +1026,24 @@
                 value = value.replace(/(\d{3})(\d{4})(\d+)/, '$1-$2-$3');
             }
             e.target.value = value;
+        });
+        
+        // ==================== 초기화 ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // 기본 등급 선택
+            document.querySelector('.tier-option[data-tier="bronze"]').click();
+            
+            // 사용자 목록 로드
+            loadUsers();
+            loadAdminStats();
+            
+            // 인증 상태 모니터링
+            auth.onAuthStateChanged((user) => {
+                currentUser = user;
+                if (user) {
+                    console.log('사용자 로그인:', user.email);
+                }
+            });
         });
     </script>
 </body>
