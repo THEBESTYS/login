@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Shop 사용자 관리</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 40px; background-color: #f5f5f5;">
+    <div style="max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <h1 style="color: #333;">A-Shop 사용자 관리 시스템</h1>
+        <p style="color: #666;">아래는 ashop_users 컬렉션의 문서 구조입니다:</p>
+        
+        <div style="background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 5px; margin: 20px 0; font-family: monospace; overflow-x: auto;">
+            <pre style="margin: 0;">{
+  uid: "firebase-auth-uid",
+  email: "user@ashop.com",
+  username: "사용자이름",
+  displayName: "사용자이름", 
+  phone: "010-1234-5678",
+  tier: "bronze",
+  points: 1000,
+  status: "active",
+  signupMethod: "email" | "github",
+  emailVerified: true/false,
+  marketingAgreed: { email: true, sms: false },
+  createdAt: "타임스탬프",
+  updatedAt: "타임스탬프", 
+  lastLogin: "타임스탬프"
+}</pre>
+        </div>
+        
+        <h2 style="color: #3498db;">기능 요약</h2>
+        <ul style="line-height: 1.8;">
+            <li><strong>사용자 인증</strong>: Firebase Authentication 연동</li>
+            <li><strong>등급 시스템</strong>: 브론즈 ~ 다이아몬드 등급</li>
+            <li><strong>포인트 관리</strong>: 적립 및 사용 내역 추적</li>
+            <li><strong>마케팅 동의</strong>: 이메일/SMS 수신 동의 관리</li>
+            <li><strong>활성 상태</strong>: 사용자 계정 활성/비활성 관리</li>
+        </ul>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #e8f4fc; border-radius: 5px;">
+            <h3 style="color: #2980b9;">데이터 필드 설명</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="background: #3498db; color: white;">
+                    <th style="padding: 10px; text-align: left;">필드명</th>
+                    <th style="padding: 10px; text-align: left;">설명</th>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;"><code>tier</code></td>
+                    <td style="padding: 10px;">사용자 등급 (bronze, silver, gold, platinum, diamond)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;"><code>signupMethod</code></td>
+                    <td style="padding: 10px;">가입 방법 (email 또는 github)</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;"><code>marketingAgreed</code></td>
+                    <td style="padding: 10px;">마케팅 수신 동의 정보</td>
+                </tr>
+            </table>
+        </div>
+        
+        <p style="margin-top: 30px; text-align: center; color: #7f8c8d;">
+            이 페이지는 ashop_users 컬렉션 구조를 보여주는 예시입니다.
+        </p>
+    </div>
+</body>
+</html>
