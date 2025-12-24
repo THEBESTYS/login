@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firestore 로컬 테스트</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { 
+            padding: 15px 30px; 
+            background: #4285f4; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 18px; 
+            cursor: pointer; 
+            margin: 20px 0; 
+        }
+        button:hover { background: #3367d6; }
+        #result { 
+            margin-top: 20px; 
+            padding: 20px; 
+            border-radius: 8px; 
+            background: #f8f9fa; 
+            border: 1px solid #ddd; 
+        }
+        .success { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <h1>🔥 Firestore 로컬 테스트 페이지</h1>
+    <p>이 페이지는 로컬에서 Firestore 연결을 테스트합니다.</p>
+    
+    <!-- 이 버튼이 보여야 합니다! -->
+    <button onclick="testFirestoreConnection()">
+        🔍 Firestore 연결 테스트하기
+    </button>
+    
+    <div id="result">
+        여기에 테스트 결과가 표시됩니다...
+    </div>
+
+    <script>
+        // === 1. Firebase 설정 ===
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1XDqgki7lKMz-EE4ZFzOLmku8EsLI0yI",
+            authDomain: "login-57c14.firebaseapp.com",
+            projectId: "login-57c14",
+            storageBucket: "login-57c14.firebasestorage.app",
+            messagingSenderId: "847658526472",
+            appId: "1:847658526472:web:05adaddfea3afff8e12ebd"
+        };
+
+        // === 2. Firebase 초기화 ===
+        let db;
+        try {
+            // Firebase 앱 초기화
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            
+            // Firestore 설정
+            db.settings({
+                timestampsInSnapshots: true
+            });
+            
+            console.log("✅ Firebase 초기화 성공!");
+            console.log("프로젝트 ID:", firebase.app().options.projectId);
+            
+            // 페이지 상태 업데이트
+            document.getElementById('result').innerHTML = 
+                '<p style="color: green;">✅ Firebase SDK 로드 완료. 버튼을 클릭하세요!</p>';
+                
+        } catch (error) {
+            console.error("❌ Firebase 초기화 실패:", error);
+            document.getElementById('result').innerHTML = 
+                `<p style="color: red;">❌ Firebase 초기화 실패: ${error.message}</p>`;
+        }
+
+        // === 3. 테스트 함수 ===
+        async function testFirestoreConnection() {
+            const resultDiv = document.getElementById('result');
+            
+            if (!db) {
+                resultDiv.innerHTML = '<p class="error">❌ Firestore가 초기화되지 않았습니다.</p>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<p>🔗 Firestore 연결 시도 중...</p>';
+            
+            try {
+                // Firestore에서 문서 불러오기
+                const docRef = db.collection('ashop_users').doc('test_user_001');
+                const doc = await docRef.get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    
+                    // 결과 표시
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h3>🎉 Firestore 연결 성공!</h3>
+                            <p><strong>문서 ID:</strong> ${doc.id}</p>
+                            <p><strong>이름:</strong> ${data.name || '없음'}</p>
+                            <p><strong>이메일:</strong> ${data.이메일 || data.email || '없음'}</p>
+                            <p><strong>핸드폰:</strong> ${data['핸드폰 번호'] || data.phone || '없음'}</p>
+                            <p><strong>가입일:</strong> ${data.가입일?.toDate?.().toLocaleString() || '없음'}</p>
+                            <hr>
+                            <p><small>전체 데이터:</small></p>
+                            <pre style="background: white; padding: 10px; border-radius: 5px; overflow: auto;">
+${JSON.stringify(data, null, 2)}
+                            </pre>
+                        </div>
+                    `;
+                    
+                    console.log("✅ Firestore 데이터:", data);
+                    
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            <h3>⚠️ 문서를 찾을 수 없습니다</h3>
+                            <p>Firestore에는 연결되었지만, test_user_001 문서가 없습니다.</p>
+                            <p>Firestore 콘솔에서 문서가 있는지 확인해주세요.</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error("❌ Firestore 에러:", error);
+                
+                // 에러 종류별 메시지
+                let errorMessage = error.message;
+                if (error.code === 'permission-denied') {
+                    errorMessage = "Firestore 보안 규칙에 의해 접근이 거부되었습니다.";
+                } else if (error.code === 'not-found') {
+                    errorMessage = "프로젝트를 찾을 수 없습니다. Firebase 설정을 확인하세요.";
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Firestore 연결 실패</h3>
+                        <p><strong>에러:</strong> ${errorMessage}</p>
+                        <p><strong>코드:</strong> ${error.code || '알 수 없음'}</p>
+                        <p>1. 인터넷 연결 확인<br>
+                        2. Firebase 프로젝트 확인<br>
+                        3. Firestore 보안 규칙 확인</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // === 4. 페이지 로드 완료 메시지 ===
+        window.addEventListener('load', function() {
+            console.log("🔄 페이지 로드 완료");
+            console.log("Firebase 사용 가능:", !!firebase.apps.length);
+            console.log("Firestore 사용 가능:", !!db);
+        });
+    </script>
+</body>
+</html>
