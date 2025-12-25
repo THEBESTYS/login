@@ -231,19 +231,18 @@
             }
         }
         
-        // ====== 회원가입 함수 ======
-        async function handleSignup() {
+        // ====== 회원가입 함수 =====
+        window.handleSignup = async function() {
             console.log("🚨🚨🚨 handleSignup 함수가 실행됩니다!");
-    
             console.log("📝 이메일 회원가입 시작");
-            console.log("=== 회원가입 시작 ===");
-            
-            // 값 가져오기
+    
+        // 입력값 가져오기
             const email = document.getElementById('signup-email').value.trim();
-            const name = document.getElementById('signup-name').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('signup-password').value;
-            const confirm = document.getElementById('signup-confirm').value;
-            
+            const confirmPassword = document.getElementById('confirm-password').value;
+        a
             // 유효성 검사
             if (!email || !name || !password || !confirm) {
                 showMessage('signup', '모든 항목을 입력해주세요.', 'error');
