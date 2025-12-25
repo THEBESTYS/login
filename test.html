@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Firebase 테스트</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <h1>Firebase 테스트 페이지</h1>
+    <button onclick="testFirebase()">Firebase 테스트</button>
+    
+    <script>
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1XDqgki7lKMz-EE4ZFzOLmku8EsLI0yI",
+            authDomain: "login-57c14.firebaseapp.com",
+            projectId: "login-57c14",
+            storageBucket: "login-57c14.firebasestorage.app",
+            messagingSenderId: "847658526472",
+            appId: "1:847658526472:web:05adaddfea3afff8e12ebd"
+        };
+        
+        function testFirebase() {
+            console.log("=== Firebase 테스트 시작 ===");
+            
+            // 1. firebase 객체 존재 확인
+            console.log("1. firebase 객체:", typeof firebase);
+            console.log("2. firebase.app:", typeof firebase.app);
+            
+            if (typeof firebase === 'undefined') {
+                alert("❌ firebase 객체가 정의되지 않았습니다!");
+                return;
+            }
+            
+            // 2. Firebase 초기화
+            try {
+                firebase.initializeApp(firebaseConfig);
+                console.log("✅ Firebase 초기화 성공");
+                
+                // 3. Auth, Firestore 객체 확인
+                const auth = firebase.auth();
+                const db = firebase.firestore();
+                console.log("✅ Auth 객체:", auth);
+                console.log("✅ Firestore 객체:", db);
+                
+                alert("🎉 Firebase 모든 테스트 성공!\n콘솔을 확인하세요.");
+                
+            } catch (error) {
+                console.error("❌ Firebase 초기화 실패:", error);
+                alert("Firebase 초기화 실패: " + error.message);
+            }
+        }
+        
+        // 페이지 로드 시 자동 테스트
+        window.onload = function() {
+            console.log("페이지 로드 완료");
+            console.log("firebase 객체 상태:", typeof firebase);
+        };
+    </script>
+</body>
+</html>
