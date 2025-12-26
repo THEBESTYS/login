@@ -1,191 +1,562 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>로그인 시스템 - 최종 버전</title>
-    <style>
-        body { 
-            font-family: Arial; 
-            max-width: 400px; 
-            margin: 50px auto; 
-            padding: 20px; 
-        }
-        .tabs { display: flex; margin-bottom: 20px; }
-        .tab { 
-            flex: 1; 
-            padding: 10px; 
-            border: none; 
-            background: #eee; 
-            cursor: pointer; 
-        }
-        .tab.active { background: #007bff; color: white; }
-        .panel { 
-            padding: 20px; 
-            border: 1px solid #ddd; 
-            border-radius: 5px; 
-            display: none; 
-        }
-        .panel.active { display: block; }
-        input { 
-            width: 100%; 
-            padding: 10px; 
-            margin: 10px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-        }
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            background: #28a745; 
-            color: white; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            margin-top: 10px; 
-        }
-        .message { 
-            padding: 10px; 
-            margin: 10px 0; 
-            border-radius: 4px; 
-            display: none; 
-        }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 | 회원가입</title>
     
-    <!-- 핵심: 여기에 Firebase 모의 객체를 먼저 정의 -->
-    <script>
-        // ====== FIREBASE 모의 객체 ======
-        console.log("🔧 Firebase 모의 객체 생성 시작");
+    <!-- Firebase SDK v9 (호환성 모드) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* 무채색 디자인 시스템 */
+        :root {
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
         
-        // 전역 firebase 객체 생성
-        window.firebase = {
-            // 기본 속성
-            apps: [],
-            _initialized: false,
-            
-            // 초기화 함수
-            initializeApp: function(config) {
-                console.log("🔥 Firebase 초기화 호출:", config.projectId);
-                this.apps.push({
-                    name: '[DEFAULT]',
-                    options: config,
-                    _initialized: true
-                });
-                this._initialized = true;
-                console.log("✅ Firebase 초기화 완료");
-                return this.apps[0];
-            },
-            
-            // 인증 서비스
-            auth: function() {
-                console.log("🔐 Auth 서비스 생성");
-                return {
-                    createUserWithEmailAndPassword: function(email, password) {
-                        console.log("📝 회원가입 시뮬레이션:", email);
-                        return new Promise((resolve, reject) => {
-                            // 2초 후 성공 시뮬레이션
-                            setTimeout(() => {
-                                console.log("✅ 모의 회원가입 성공");
-                                resolve({
-                                    user: {
-                                        uid: 'mock-uid-' + Date.now(),
-                                        email: email,
-                                        displayName: email.split('@')[0]
-                                    }
-                                });
-                            }, 2000);
-                        });
-                    },
-                    
-                    signInWithEmailAndPassword: function(email, password) {
-                        console.log("🔑 로그인 시뮬레이션:", email);
-                        return new Promise((resolve, reject) => {
-                            setTimeout(() => {
-                                console.log("✅ 모의 로그인 성공");
-                                resolve({
-                                    user: {
-                                        uid: 'mock-user-001',
-                                        email: email
-                                    }
-                                });
-                            }, 2000);
-                        });
-                    }
-                };
-            },
-            
-            // Firestore 서비스
-            firestore: function() {
-                console.log("🗄️ Firestore 서비스 생성");
-                return {
-                    collection: function(collectionName) {
-                        return {
-                            doc: function(docId) {
-                                return {
-                                    set: function(data) {
-                                        console.log("💾 Firestore 저장 시뮬레이션:", collectionName, docId, data);
-                                        return new Promise((resolve) => {
-                                            setTimeout(() => {
-                                                console.log("✅ 모의 Firestore 저장 완료");
-                                                resolve();
-                                            }, 1500);
-                                        });
-                                    },
-                                    update: function(data) {
-                                        console.log("📝 Firestore 업데이트:", data);
-                                        return Promise.resolve();
-                                    }
-                                };
-                            }
-                        };
-                    }
-                };
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .tabs {
+            display: flex;
+            background: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 20px 0;
+            background: none;
+            border: none;
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-button:hover {
+            color: var(--gray-800);
+            background: var(--gray-100);
+        }
+        
+        .tab-button.active {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            right: 25%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .form-panel {
+            padding: 40px;
+            display: none;
+        }
+        
+        .form-panel.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .form-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .form-subtitle {
+            font-size: 14px;
+            color: var(--gray-500);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .input-group {
+            margin-bottom: 22px;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+        }
+        
+        .input-label.required::after {
+            content: ' *';
+            color: var(--danger);
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: 2px solid var(--gray-300);
+            border-radius: 10px;
+            background: var(--white);
+            color: var(--gray-800);
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .input-field.error {
+            border-color: var(--danger);
+        }
+        
+        .input-field.success {
+            border-color: var(--success);
+        }
+        
+        .input-field::placeholder {
+            color: var(--gray-400);
+        }
+        
+        .field-note {
+            display: block;
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+        
+        .field-error {
+            display: block;
+            font-size: 13px;
+            color: var(--danger);
+            margin-top: 6px;
+            display: none;
+        }
+        
+        .submit-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .submit-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .submit-button:active {
+            transform: translateY(0);
+        }
+        
+        .submit-button.loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 32px 0;
+            color: var(--gray-400);
+            font-size: 14px;
+        }
+        
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+        
+        .divider span {
+            padding: 0 16px;
+            background: var(--white);
+        }
+        
+        .links {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+        
+        .links a {
+            color: var(--primary);
+            text-decoration: none;
+            margin: 0 12px;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .links a:hover {
+            color: var(--primary-hover);
+            text-decoration: underline;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+        
+        .checkbox-input {
+            margin-top: 3px;
+            margin-right: 14px;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .checkbox-label {
+            font-size: 15px;
+            color: var(--gray-700);
+            line-height: 1.5;
+            cursor: pointer;
+        }
+        
+        .checkbox-label a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .checkbox-label a:hover {
+            text-decoration: underline;
+        }
+        
+        .checkbox-label strong {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+        
+        .terms-section {
+            background: var(--gray-50);
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 28px 0;
+            max-height: 240px;
+            overflow-y: auto;
+        }
+        
+        .terms-title {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 18px;
+        }
+        
+        hr {
+            border: none;
+            height: 1px;
+            background: var(--gray-200);
+            margin: 18px 0;
+        }
+        
+        /* 상태 메시지 */
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            display: block;
+        }
+        
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+        
+        .status-info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            display: block;
+        }
+        
+        /* 로딩 스피너 */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 관리자 링크 영역 */
+        .admin-link-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-200);
+            text-align: center;
+        }
+        
+        .admin-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .admin-link:hover {
+            background: var(--gray-200);
+            color: var(--gray-800);
+        }
+        
+        @media (max-width: 480px) {
+            .auth-container {
+                border-radius: 12px;
             }
-        };
-        
-        console.log("✅ Firebase 모의 객체 생성 완료");
-        console.log("window.firebase:", window.firebase);
-    </script>
+            
+            .form-panel {
+                padding: 24px;
+            }
+            
+            .tab-button {
+                font-size: 16px;
+                padding: 16px 0;
+            }
+            
+            .form-title {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>로그인 시스템 (모의 Firebase)</h1>
-    
-    <div class="tabs">
-        <button class="tab active" onclick="showPanel('login')">로그인</button>
-        <button class="tab" onclick="showPanel('signup')">회원가입</button>
-    </div>
-    
-    <!-- 로그인 패널 -->
-    <div id="login-panel" class="panel active">
-        <h2>로그인</h2>
-        <div id="login-message" class="message"></div>
-        <input type="email" id="login-email" placeholder="이메일">
-        <input type="password" id="login-password" placeholder="비밀번호">
-        <button onclick="handleLogin()">로그인</button>
-    </div>
-    
-    <!-- 회원가입 패널 -->
-    <div id="signup-panel" class="panel">
-        <h2>회원가입</h2>
-        <div id="signup-message" class="message"></div>
-        <input type="email" id="signup-email" placeholder="이메일">
-        <input type="text" id="signup-name" placeholder="이름">
-        <input type="password" id="signup-password" placeholder="비밀번호 (6자 이상)">
-        <input type="password" id="signup-confirm" placeholder="비밀번호 확인">
-        <button onclick="handleSignup()">회원가입</button>
-    </div>
-    
-    <!-- 테스트 영역 -->
-    <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3>시스템 테스트</h3>
-        <button onclick="testFirebaseObject()" style="background: #6c757d;">Firebase 객체 테스트</button>
-        <button onclick="testTabSwitching()" style="background: #17a2b8;">탭 전환 테스트</button>
-        <button onclick="showConsoleInfo()" style="background: #343a40;">콘솔 정보</button>
+    <div class="auth-container">
+        <!-- 탭 메뉴 -->
+        <div class="tabs">
+            <button class="tab-button active" data-tab="login">로그인</button>
+            <button class="tab-button" data-tab="signup">회원가입</button>
+        </div>
+        
+        <!-- 로그인 폼 -->
+        <div id="login-form" class="form-panel active">
+            <h2 class="form-title">로그인</h2>
+            <p class="form-subtitle">계정이 없으시다면 회원가입을 진행해주세요</p>
+            
+            <!-- 상태 메시지 -->
+            <div id="login-status" class="status-message"></div>
+            
+            <div class="input-group">
+                <label class="input-label required" for="email">이메일</label>
+                <input type="email" id="email" class="input-field" placeholder="이메일을 입력하세요">
+                <div class="field-error" id="email-error"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label required" for="password">비밀번호</label>
+                <input type="password" id="password" class="input-field" placeholder="비밀번호를 입력하세요">
+                <div class="field-error" id="password-error"></div>
+            </div>
+            
+            <button class="submit-button" id="login-btn">
+                로그인
+            </button>
+            
+            <div class="links">
+                <a href="#" id="forgot-password">비밀번호 찾기</a>
+                <a href="#" data-tab="signup">회원가입</a>
+            </div>
+            
+            <!-- 관리자 페이지 링크 -->
+            <div class="admin-link-section">
+                <a href="../admin/index.html" class="admin-link">
+                    🔧 관리자 페이지로 이동
+                </a>
+            </div>
+        </div>
+        
+        <!-- 회원가입 폼 -->
+        <div id="signup-form" class="form-panel">
+            <h2 class="form-title">회원가입</h2>
+            <p class="form-subtitle">빠르고 간편한 회원가입으로 다양한 혜택을 누려보세요</p>
+            
+            <!-- 상태 메시지 -->
+            <div id="signup-status" class="status-message"></div>
+            
+            <div class="input-group">
+                <label class="input-label required" for="signup-email">이메일</label>
+                <input type="email" id="signup-email" class="input-field" placeholder="이메일을 입력해주세요">
+                <div class="field-error" id="signup-email-error"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label required" for="username">이름</label>
+                <input type="text" id="username" class="input-field" placeholder="이름을 입력해주세요">
+                <div class="field-error" id="username-error"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label" for="phone">핸드폰 번호</label>
+                <input type="tel" id="phone" class="input-field" placeholder="예) 010-1234-5678">
+                <span class="field-note">하이픈(-)을 포함하여 입력해주세요</span>
+                <div class="field-error" id="phone-error"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label required" for="signup-password">비밀번호</label>
+                <input type="password" id="signup-password" class="input-field" placeholder="비밀번호를 입력해주세요">
+                <span class="field-note">영문, 숫자, 특수문자를 포함한 8자 이상</span>
+                <div class="field-error" id="signup-password-error"></div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label required" for="confirm-password">비밀번호 확인</label>
+                <input type="password" id="confirm-password" class="input-field" placeholder="비밀번호를 다시 입력해주세요">
+                <div class="field-error" id="confirm-password-error"></div>
+            </div>
+            
+            <!-- 약관 동의 -->
+            <div class="terms-section">
+                <div class="terms-title">약관 동의</div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="terms-all" class="checkbox-input">
+                    <label for="terms-all" class="checkbox-label"><strong>모든 약관에 동의합니다</strong></label>
+                </div>
+                
+                <hr>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="terms-age" class="checkbox-input term" required>
+                    <label for="terms-age" class="checkbox-label">만 14세 이상입니다. (필수)</label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="terms-service" class="checkbox-input term" required>
+                    <label for="terms-service" class="checkbox-label">서비스 이용약관 동의 (필수) <a href="#" id="view-service-terms">보기</a></label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="terms-privacy" class="checkbox-input term" required>
+                    <label for="terms-privacy" class="checkbox-label">개인정보 수집 및 이용 동의 (필수) <a href="#" id="view-privacy-terms">보기</a></label>
+                </div>
+                
+                <div class="checkbox-item">
+                    <input type="checkbox" id="terms-marketing" class="checkbox-input term">
+                    <label for="terms-marketing" class="checkbox-label">이벤트 및 SMS 마케팅 정보 수신 동의 (선택)</label>
+                </div>
+            </div>
+            
+            <button class="submit-button" id="signup-btn">
+                회원가입
+            </button>
+            
+            <div class="links">
+                이미 계정이 있으신가요? <a href="#" data-tab="login">로그인</a>
+            </div>
+            
+            <!-- 관리자 페이지 링크 -->
+            <div class="admin-link-section">
+                <a href="../admin/index.html" class="admin-link">
+                    🔧 관리자 페이지로 이동
+                </a>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ====== Firebase 설정 ======
+        // ========== Firebase 설정 ==========
         const firebaseConfig = {
             apiKey: "AIzaSyC1XDqgki7lKMz-EE4ZFzOLmku8EsLI0yI",
             authDomain: "login-57c14.firebaseapp.com",
@@ -194,265 +565,533 @@
             messagingSenderId: "847658526472",
             appId: "1:847658526472:web:05adaddfea3afff8e12ebd"
         };
-        
-        // ====== UI 함수 ======
-        function showPanel(panelName) {
-            console.log("전환할 패널:", panelName);
-            
-            // 모든 탭 비활성화
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // 선택한 탭 활성화
-            document.querySelector(`.tab[onclick="showPanel('${panelName}')"]`).classList.add('active');
-            
-            // 모든 패널 숨기기
-            document.querySelectorAll('.panel').forEach(panel => {
-                panel.classList.remove('active');
-            });
-            
-            // 선택한 패널 표시
-            document.getElementById(panelName + '-panel').classList.add('active');
-            
-            console.log("패널 전환 완료:", panelName);
+
+        // ========== 전역 변수 ==========
+        let auth = null;
+        let db = null;
+        let firebaseApp = null;
+
+        // ========== Firebase 초기화 ==========
+        function initializeFirebase() {
+            try {
+                console.log("🔥 Firebase 초기화 시도...");
+                
+                // 이미 초기화되었는지 확인
+                if (firebase.apps.length > 0) {
+                    firebaseApp = firebase.apps[0];
+                    console.log("✅ 이미 초기화된 Firebase 앱 사용");
+                } else {
+                    firebaseApp = firebase.initializeApp(firebaseConfig);
+                    console.log("✅ 새로운 Firebase 앱 초기화 성공");
+                }
+                
+                auth = firebase.auth();
+                db = firebase.firestore();
+                
+                console.log("✅ Firebase 서비스 준비 완료");
+                console.log("프로젝트 ID:", firebaseApp.options.projectId);
+                console.log("Firestore 상태:", !!db ? "준비됨" : "실패");
+                
+                return true;
+            } catch (error) {
+                console.error("❌ Firebase 초기화 실패:", error);
+                showStatus('login', 'Firebase 연결에 실패했습니다. 네트워크를 확인해주세요.', 'error');
+                return false;
+            }
         }
-        
-        function showMessage(panel, message, type) {
-            const messageEl = document.getElementById(panel + '-message');
-            messageEl.textContent = message;
-            messageEl.className = 'message ' + type;
-            messageEl.style.display = 'block';
+
+        // ========== UI 함수들 ==========
+        function showStatus(formId, message, type = 'info') {
+            const statusEl = document.getElementById(`${formId}-status`);
+            if (!statusEl) return;
             
-            if (type === 'success' || type === 'error') {
+            statusEl.textContent = message;
+            statusEl.className = `status-message status-${type}`;
+            statusEl.style.display = 'block';
+            
+            if (type === 'error' || type === 'success') {
                 setTimeout(() => {
-                    messageEl.style.display = 'none';
+                    statusEl.style.display = 'none';
                 }, 5000);
             }
         }
-        
-        // ====== 회원가입 함수 =====
-        window.handleSignup = async function() {
-            console.log("🚨🚨🚨 handleSignup 함수가 실행됩니다!");
-            console.log("📝 이메일 회원가입 시작");
-    
-        // 입력값 가져오기
+
+        function setLoading(buttonId, isLoading) {
+            const button = document.getElementById(buttonId);
+            if (!button) return;
+            
+            if (isLoading) {
+                button.classList.add('loading');
+                button.innerHTML = '<span class="spinner"></span>처리 중...';
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.innerHTML = buttonId === 'login-btn' ? '로그인' : '회원가입';
+                button.disabled = false;
+            }
+        }
+
+        function showError(fieldId, message) {
+            const errorEl = document.getElementById(`${fieldId}-error`);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                const inputEl = document.getElementById(fieldId);
+                if (inputEl) inputEl.classList.add('error');
+            }
+        }
+
+        function clearErrors(fieldIds) {
+            fieldIds.forEach(fieldId => {
+                const errorEl = document.getElementById(`${fieldId}-error`);
+                if (errorEl) {
+                    errorEl.style.display = 'none';
+                }
+                const inputEl = document.getElementById(fieldId);
+                if (inputEl) inputEl.classList.remove('error');
+            });
+        }
+
+        function showTab(tabName) {
+            // 탭 버튼 활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.tab-button[data-tab="${tabName}"]`).classList.add('active');
+            
+            // 폼 패널 활성화
+            document.querySelectorAll('.form-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-form`).classList.add('active');
+            
+            // 상태 메시지 초기화
+            if (tabName === 'login') {
+                document.getElementById('signup-status').style.display = 'none';
+                setTimeout(() => document.getElementById('email').focus(), 100);
+            } else {
+                document.getElementById('login-status').style.display = 'none';
+                setTimeout(() => document.getElementById('signup-email').focus(), 100);
+            }
+        }
+
+        // ========== 유효성 검사 함수 ==========
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 8;
+        }
+
+        function validatePhone(phone) {
+            if (!phone) return true;
+            const regex = /^\d{3}-\d{3,4}-\d{4}$/;
+            return regex.test(phone);
+        }
+
+        // ========== 회원가입 처리 ==========
+        async function handleSignup() {
+            console.log("📝 회원가입 시작");
+            
+            // 입력값 가져오기
             const email = document.getElementById('signup-email').value.trim();
             const username = document.getElementById('username').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('signup-password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
-        a
+            
             // 유효성 검사
-            if (!email || !name || !password || !confirm) {
-                showMessage('signup', '모든 항목을 입력해주세요.', 'error');
+            let hasError = false;
+            
+            if (!email) {
+                showError('signup-email', '이메일을 입력해주세요.');
+                hasError = true;
+            } else if (!validateEmail(email)) {
+                showError('signup-email', '올바른 이메일 형식이 아닙니다.');
+                hasError = true;
+            }
+            
+            if (!username) {
+                showError('username', '이름을 입력해주세요.');
+                hasError = true;
+            }
+            
+            if (!validatePhone(phone)) {
+                showError('phone', '올바른 핸드폰 번호 형식이 아닙니다. (예: 010-1234-5678)');
+                hasError = true;
+            }
+            
+            if (!password) {
+                showError('signup-password', '비밀번호를 입력해주세요.');
+                hasError = true;
+            } else if (!validatePassword(password)) {
+                showError('signup-password', '비밀번호는 8자 이상이어야 합니다.');
+                hasError = true;
+            }
+            
+            if (!confirmPassword) {
+                showError('confirm-password', '비밀번호 확인을 입력해주세요.');
+                hasError = true;
+            } else if (password !== confirmPassword) {
+                showError('confirm-password', '비밀번호가 일치하지 않습니다.');
+                hasError = true;
+            }
+            
+            // 약관 동의 확인
+            const termsAge = document.getElementById('terms-age').checked;
+            const termsService = document.getElementById('terms-service').checked;
+            const termsPrivacy = document.getElementById('terms-privacy').checked;
+            
+            if (!termsAge || !termsService || !termsPrivacy) {
+                showStatus('signup', '필수 약관에 모두 동의해주세요.', 'error');
+                hasError = true;
+            }
+            
+            if (hasError) {
+                console.log("❌ 유효성 검사 실패");
                 return;
             }
             
-            if (password !== confirm) {
-                showMessage('signup', '비밀번호가 일치하지 않습니다.', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showMessage('signup', '비밀번호는 6자 이상이어야 합니다.', 'error');
-                return;
-            }
-            
-            // 버튼 상태 변경
-            const btn = document.querySelector('#signup-panel button');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = '가입 처리 중...';
+            // 모든 에러 초기화
+            clearErrors(['signup-email', 'username', 'phone', 'signup-password', 'confirm-password']);
+            setLoading('signup-btn', true);
             
             try {
-                // Firebase 객체 확인
-                if (typeof firebase === 'undefined') {
-                    throw new Error('Firebase 객체가 없습니다.');
-                }
+                console.log('1. Firebase Auth 사용자 생성 시도:', email);
                 
-                console.log("1. Firebase 객체 확인됨");
-                
-                // Firebase 초기화
-                const app = firebase.initializeApp(firebaseConfig);
-                console.log("2. Firebase 초기화 완료:", app.options.projectId);
-                
-                const auth = firebase.auth();
-                const db = firebase.firestore();
-                console.log("3. 서비스 객체 생성 완료");
-                
-                // 모의 회원가입 실행
-                showMessage('signup', '회원가입 처리 중...', 'success');
-                
+                // 1. Firebase Auth에 사용자 생성
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                console.log("4. 사용자 생성 완료:", user.uid);
+                console.log('✅ 2. Firebase Auth 생성 성공:', user.uid);
                 
-                // Firestore에 저장
+                // 마케팅 동의 여부
+                const marketingAgreed = {
+                    email: document.getElementById('terms-marketing')?.checked || false,
+                    sms: false
+                };
+                
+                // 2. Firestore에 저장할 데이터
                 const userData = {
                     uid: user.uid,
                     email: email,
-                    displayName: name,
+                    username: username,
+                    phone: phone || '',
+                    displayName: username,
                     tier: 'bronze',
                     points: 1000,
                     status: 'active',
                     signupMethod: 'email',
-                    createdAt: new Date().toISOString(),
-                    lastLogin: new Date().toISOString()
+                    emailVerified: false,
+                    marketingAgreed: marketingAgreed,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 };
                 
+                console.log('3. Firestore 저장 시도:', userData);
+                
+                // 3. Firestore에 저장
                 await db.collection('ashop_users').doc(user.uid).set(userData);
-                console.log("5. Firestore 저장 완료");
                 
-                // 성공 메시지
-                showMessage('signup', `🎉 ${name}님, 회원가입 완료! (모의 데이터)`, 'success');
+                console.log('✅ 4. Firestore 저장 완료!');
                 
-                // 폼 초기화
+                // 4. 이메일 인증 메일 발송
+                await user.sendEmailVerification();
+                console.log('📧 5. 이메일 인증 메일 발송됨');
+                
+                // 5. 성공 메시지 표시
+                showStatus('signup', 
+                    `🎉 ${username}님, 회원가입이 완료되었습니다!\n가입 축하 포인트 1,000점이 지급되었습니다.\n이메일 인증을 완료해주세요.`, 
+                    'success'
+                );
+                
+                // 6. 폼 초기화
                 document.getElementById('signup-email').value = '';
-                document.getElementById('signup-name').value = '';
+                document.getElementById('username').value = '';
+                document.getElementById('phone').value = '';
                 document.getElementById('signup-password').value = '';
-                document.getElementById('signup-confirm').value = '';
+                document.getElementById('confirm-password').value = '';
+                document.getElementById('terms-all').checked = false;
+                document.querySelectorAll('.term').forEach(term => term.checked = false);
                 
-                // 로그인 탭으로 전환
+                // 7. 3초 후 로그인 탭으로 전환
                 setTimeout(() => {
-                    showPanel('login');
-                    document.getElementById('login-email').value = email;
-                    showMessage('login', `${name}님, 로그인해주세요!`, 'success');
-                }, 2000);
+                    showTab('login');
+                    document.getElementById('email').value = email;
+                    showStatus('login', `${username}님, 로그인해주세요!`, 'success');
+                }, 3000);
                 
             } catch (error) {
-                console.error("회원가입 에러:", error);
-                showMessage('signup', `에러: ${error.message}`, 'error');
+                console.error('❌ 회원가입 실패:', error);
+                
+                let errorMessage = '회원가입에 실패했습니다.';
+                
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = '이미 사용 중인 이메일입니다.';
+                        showError('signup-email', errorMessage);
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = '비밀번호가 너무 약합니다. 더 강력한 비밀번호를 사용해주세요.';
+                        showError('signup-password', errorMessage);
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = '유효하지 않은 이메일 형식입니다.';
+                        showError('signup-email', errorMessage);
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = '이메일/비밀번호 회원가입이 비활성화되어 있습니다.';
+                        showStatus('signup', errorMessage, 'error');
+                        break;
+                    case 'permission-denied':
+                        errorMessage = '데이터베이스 접근 권한이 없습니다.';
+                        showStatus('signup', errorMessage, 'error');
+                        break;
+                    default:
+                        showStatus('signup', `${errorMessage}: ${error.message}`, 'error');
+                }
                 
             } finally {
-                // 버튼 복원
-                btn.disabled = false;
-                btn.textContent = originalText;
+                setLoading('signup-btn', false);
             }
         }
-        
-        // ====== 로그인 함수 ======
+
+        // ========== 로그인 처리 ==========
         async function handleLogin() {
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
+            console.log("🔐 로그인 시작");
             
-            if (!email || !password) {
-                showMessage('login', '이메일과 비밀번호를 입력해주세요.', 'error');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            // 유효성 검사
+            if (!email) {
+                showError('email', '이메일을 입력해주세요.');
                 return;
             }
             
-            const btn = document.querySelector('#login-panel button');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = '로그인 중...';
+            if (!validateEmail(email)) {
+                showError('email', '올바른 이메일 형식이 아닙니다.');
+                return;
+            }
+            
+            if (!password) {
+                showError('password', '비밀번호를 입력해주세요.');
+                return;
+            }
+            
+            clearErrors(['email', 'password']);
+            setLoading('login-btn', true);
             
             try {
-                if (typeof firebase === 'undefined') {
-                    throw new Error('Firebase 객체가 없습니다.');
-                }
-                
-                const auth = firebase.auth();
-                showMessage('login', '로그인 처리 중...', 'success');
+                console.log('로그인 시도:', email);
                 
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
                 
-                showMessage('login', `✅ ${email}님, 로그인 성공! (모의 데이터)`, 'success');
+                console.log('✅ 로그인 성공:', user.uid);
                 
-                // 홈페이지로 이동 시뮬레이션
+                // 로그인 시간 업데이트
+                if (db) {
+                    try {
+                        await db.collection('ashop_users').doc(user.uid).update({
+                            lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        console.log('✅ 로그인 시간 업데이트 완료');
+                    } catch (updateError) {
+                        console.warn('로그인 시간 업데이트 실패 (무시 가능):', updateError);
+                    }
+                }
+                
+                // 성공 메시지
+                showStatus('login', `${user.email}님, 환영합니다!`, 'success');
+                
+                // 입력 필드 초기화
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                
+                // 2초 후 홈페이지로 이동
                 setTimeout(() => {
-                    showMessage('login', '홈페이지로 이동합니다...', 'success');
-                }, 1500);
+                    window.location.href = '../index.html';
+                }, 2000);
                 
             } catch (error) {
-                console.error("로그인 에러:", error);
-                showMessage('login', `로그인 실패: ${error.message}`, 'error');
+                console.error('❌ 로그인 실패:', error);
+                
+                let errorMessage = '로그인에 실패했습니다.';
+                
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = '존재하지 않는 이메일입니다.';
+                        showError('email', errorMessage);
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = '비밀번호가 틀렸습니다.';
+                        showError('password', errorMessage);
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = '유효하지 않은 이메일 형식입니다.';
+                        showError('email', errorMessage);
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = '사용이 중지된 계정입니다.';
+                        showError('email', errorMessage);
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = '너무 많은 시도가 있었습니다. 잠시 후 다시 시도해주세요.';
+                        showStatus('login', errorMessage, 'error');
+                        break;
+                    default:
+                        showStatus('login', `${errorMessage}: ${error.message}`, 'error');
+                }
                 
             } finally {
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                }, 2000);
+                setLoading('login-btn', false);
             }
         }
-        
-        // ====== 테스트 함수 ======
-        function testFirebaseObject() {
-            console.log("=== Firebase 객체 테스트 ===");
-            console.log("1. firebase 타입:", typeof firebase);
-            console.log("2. firebase 내용:", firebase);
-            console.log("3. window.firebase:", window.firebase);
+
+        // ========== 비밀번호 재설정 ==========
+        async function handleForgotPassword() {
+            const email = prompt('비밀번호를 재설정할 이메일 주소를 입력해주세요:');
             
-            if (typeof firebase !== 'undefined') {
-                alert(`✅ Firebase 객체 있음!\n\napps 개수: ${firebase.apps.length}\n초기화됨: ${firebase._initialized || 'false'}`);
-            } else {
-                alert("❌ Firebase 객체 없음\n\nwindow 객체에서 확인 중...");
-                console.log("전역 window 객체:", Object.keys(window));
+            if (!email) return;
+            
+            if (!validateEmail(email)) {
+                alert('올바른 이메일 형식을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                await auth.sendPasswordResetEmail(email);
+                alert(`비밀번호 재설정 메일을 ${email}로 발송했습니다.\n이메일을 확인해주세요.`);
+            } catch (error) {
+                console.error('비밀번호 재설정 실패:', error);
+                alert('비밀번호 재설정에 실패했습니다. 이메일 주소를 확인해주세요.');
             }
         }
-        
-        function testTabSwitching() {
-            const currentTab = document.querySelector('.tab.active').textContent;
-            alert(`현재 탭: ${currentTab}\n\n탭 전환 테스트를 실행합니다.`);
+
+        // ========== 이벤트 리스너 설정 ==========
+        function setupEventListeners() {
+            console.log("🔗 이벤트 리스너 설정 시작");
             
-            if (currentTab === '로그인') {
-                showPanel('signup');
-                setTimeout(() => {
-                    showPanel('login');
-                    alert("탭 전환 테스트 완료!");
-                }, 1000);
-            } else {
-                showPanel('login');
-                setTimeout(() => {
-                    showPanel('signup');
-                    alert("탭 전환 테스트 완료!");
-                }, 1000);
+            // 탭 버튼
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.getAttribute('data-tab');
+                    showTab(tabName);
+                });
+            });
+            
+            // 회원가입 버튼
+            const signupBtn = document.getElementById('signup-btn');
+            if (signupBtn) {
+                signupBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    console.log("✅ 회원가입 버튼 클릭됨!");
+                    await handleSignup();
+                });
             }
-        }
-        
-        function showConsoleInfo() {
-            console.log("=== 시스템 정보 ===");
-            console.log("페이지 제목:", document.title);
-            console.log("Firebase 객체:", typeof firebase);
-            console.log("Firebase 내용:", firebase);
-            console.log("모든 전역 변수:", Object.keys(window).filter(k => !k.startsWith('_') && k !== 'window'));
             
-            alert("시스템 정보가 콘솔에 출력되었습니다.\nF12를 눌러 확인하세요.");
-        }
-        
-        // ====== 초기화 ======
-        console.log("=== 시스템 초기화 ===");
-        console.log("1. firebase 객체:", typeof firebase);
-        console.log("2. firebase 내용:", firebase);
-        console.log("3. 페이지 로드 완료");
-        
-        // 페이지 로드 시 자동 테스트
-        window.onload = function() {
-            console.log("4. window.onload 실행");
+            // 로그인 버튼
+            const loginBtn = document.getElementById('login-btn');
+            if (loginBtn) {
+                loginBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    console.log("✅ 로그인 버튼 클릭됨!");
+                    await handleLogin();
+                });
+            }
             
-            if (typeof firebase !== 'undefined') {
-                console.log("✅ Firebase 객체 로드 성공");
-                console.log("Firebase apps:", firebase.apps.length);
-            } else {
-                console.error("❌ Firebase 객체 로드 실패");
-                
-                // 최후의 수단: 직접 생성
-                if (!window.firebase) {
-                    window.firebase = { apps: [], _emergency: true };
-                    console.log("⚠️ 긴급 Firebase 객체 생성");
+            // 비밀번호 찾기
+            const forgotPasswordBtn = document.getElementById('forgot-password');
+            if (forgotPasswordBtn) {
+                forgotPasswordBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleForgotPassword();
+                });
+            }
+            
+            // 탭 전환 링크
+            document.querySelectorAll('a[data-tab]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabName = link.getAttribute('data-tab');
+                    showTab(tabName);
+                });
+            });
+            
+            // 약관 전체 동의
+            const termsAll = document.getElementById('terms-all');
+            if (termsAll) {
+                termsAll.addEventListener('click', () => {
+                    const isChecked = termsAll.checked;
+                    document.querySelectorAll('.term').forEach(term => {
+                        term.checked = isChecked;
+                    });
+                });
+            }
+            
+            // 약관 보기
+            document.getElementById('view-service-terms')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('서비스 이용약관 내용이 여기에 표시됩니다...');
+            });
+            
+            document.getElementById('view-privacy-terms')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                alert('개인정보 수집 및 이용 약관 내용이 여기에 표시됩니다...');
+            });
+            
+            // 엔터 키로 폼 제출
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const activePanel = document.querySelector('.form-panel.active');
+                    if (activePanel.id === 'login-form') {
+                        e.preventDefault();
+                        handleLogin();
+                    } else if (activePanel.id === 'signup-form') {
+                        e.preventDefault();
+                        handleSignup();
+                    }
                 }
+            });
+            
+            console.log("✅ 이벤트 리스너 설정 완료");
+        }
+
+        // ========== 페이지 초기화 ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("📄 DOM 로드 완료");
+            
+            // Firebase 초기화
+            const firebaseInitialized = initializeFirebase();
+            
+            if (firebaseInitialized) {
+                showStatus('login', '시스템 연결이 준비되었습니다.', 'success');
+                
+                // 인증 상태 감시
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        console.log("👤 현재 로그인된 사용자:", user.email);
+                        if (user.emailVerified) {
+                            console.log("✅ 이메일 인증 완료됨");
+                        }
+                    } else {
+                        console.log("🚪 로그인된 사용자 없음");
+                    }
+                });
             }
             
-            console.log("5. 시스템 준비 완료");
-        };
-        
-        // 엔터 키 지원
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const activePanel = document.querySelector('.panel.active').id;
-                if (activePanel === 'login-panel') handleLogin();
-                if (activePanel === 'signup-panel') handleSignup();
-            }
+            // 이벤트 리스너 설정
+            setupEventListeners();
+            
+            // 로그인 폼 이메일 필드에 포커스
+            document.getElementById('email').focus();
+            
+            console.log("✅ 페이지 초기화 완료");
         });
     </script>
 </body>
